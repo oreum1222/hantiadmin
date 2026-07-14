@@ -17,45 +17,77 @@ Views.students = function (el) {
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
       <input id="st-search" class="fld !pl-10" placeholder="이름·학교로 검색"/>
     </div>
-    <select id="st-course" class="fld !w-auto">
-      <option value="">전체 강좌</option>
-      ${App.db.courses.map(c => `<option value="${c.id}">${U.esc(c.name)}</option>`).join('')}
-    </select>
     <select id="st-status" class="fld !w-auto">
       <option value="">전체 상태</option><option>재원</option><option>휴원</option>
     </select>
   </div>
 
-  <div class="card overflow-x-auto">
-    <table class="tbl min-w-[640px]">
-      <thead><tr><th>이름</th><th>학교 · 학년</th><th>수강 강좌</th><th>결석</th><th>미완 보강</th><th>상태</th></tr></thead>
-      <tbody id="st-rows"></tbody>
-    </table>
-  </div>`;
+  <div id="st-groups" class="space-y-3"></div>`;
+
+  // 반별 접기/펼치기 상태 (세션 내 유지)
+  Views._stOpen = Views._stOpen || new Set();
+
+  const rowHTML = s => {
+    const abs = App.db.attendance.filter(a => a.studentId === s.id && a.status === '결석').length;
+    const mk = App.db.makeups.filter(m => m.studentId === s.id && m.status !== '완료').length;
+    return `<tr class="row-click" onclick="location.hash='#students/${s.id}'">
+      <td class="font-bold">${U.esc(s.name)}</td>
+      <td class="text-on-surface-variant text-[13px]">${U.esc(s.school)} ${U.esc(s.grade)}</td>
+      <td>${abs ? `<span class="text-red-400 font-bold">${abs}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
+      <td>${mk ? `<span class="text-yellow-500 font-bold">${mk}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
+      <td>${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}</td>
+    </tr>`;
+  };
+  const groupHTML = (id, title, sub, list, open) => `
+    <div class="card overflow-hidden">
+      <button class="st-grp w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-surface-container-low/60 transition-colors" data-cid="${id}">
+        <div class="flex items-center gap-2.5 min-w-0 flex-wrap">
+          <span class="material-symbols-outlined text-secondary text-[20px]">groups</span>
+          <span class="font-bold text-[15px]">${U.esc(title)}</span>
+          ${sub ? `<span class="text-on-surface-variant text-[12px]">${U.esc(sub)}</span>` : ''}
+          <span class="chip border ${list.length ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-on-surface-variant border-outline-variant'}">${list.length}명</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant transition-transform duration-200 ${open ? 'rotate-180' : ''}">expand_more</span>
+      </button>
+      ${open ? `<div class="border-t border-outline-variant overflow-x-auto">
+        ${list.length ? `<table class="tbl min-w-[560px]">
+          <thead><tr><th>이름</th><th>학교 · 학년</th><th class="w-16">결석</th><th class="w-20">미완 보강</th><th class="w-16">상태</th></tr></thead>
+          <tbody>${list.map(rowHTML).join('')}</tbody>
+        </table>` : '<p class="text-on-surface-variant text-[13px] px-5 py-4">이 반에 해당하는 학생이 없습니다.</p>'}
+      </div>` : ''}
+    </div>`;
 
   function draw() {
     const q = document.getElementById('st-search').value.trim();
-    const fc = document.getElementById('st-course').value;
     const fs = document.getElementById('st-status').value;
-    let list = [...App.db.students].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-    if (q) list = list.filter(s => s.name.includes(q) || s.school.includes(q));
-    if (fc) { const ids = new Set(App.db.enrollments.filter(e => e.courseId === fc).map(e => e.studentId)); list = list.filter(s => ids.has(s.id)); }
-    if (fs) list = list.filter(s => s.status === fs);
-    document.getElementById('st-rows').innerHTML = list.length ? list.map(s => {
-      const cs = App.coursesOf(s.id);
-      const abs = App.db.attendance.filter(a => a.studentId === s.id && a.status === '결석').length;
-      const mk = App.db.makeups.filter(m => m.studentId === s.id && m.status !== '완료').length;
-      return `<tr class="row-click" onclick="location.hash='#students/${s.id}'">
-        <td class="font-bold">${U.esc(s.name)}</td>
-        <td class="text-on-surface-variant text-[13px]">${U.esc(s.school)} ${U.esc(s.grade)}</td>
-        <td class="text-[13px]">${cs.length ? cs.map(c => `<span class="chip border border-outline-variant text-on-surface-variant mr-1">${U.esc(c.grade)} ${U.esc(c.kind)}</span>`).join('') : '<span class="text-on-surface-variant text-[12px]">—</span>'}</td>
-        <td>${abs ? `<span class="text-red-400 font-bold">${abs}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
-        <td>${mk ? `<span class="text-yellow-500 font-bold">${mk}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
-        <td>${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}</td>
-      </tr>`;
-    }).join('') : `<tr><td colspan="6" class="text-center text-on-surface-variant text-[13px] py-8">조건에 맞는 학생이 없습니다.</td></tr>`;
+    let base = [...App.db.students].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    if (q) base = base.filter(s => s.name.includes(q) || s.school.includes(q));
+    if (fs) base = base.filter(s => s.status === fs);
+    const okIds = new Set(base.map(s => s.id));
+    const searching = !!(q || fs);
+
+    let html = App.db.courses.map(c => {
+      const list = App.enrolledStudents(c.id).filter(s => okIds.has(s.id));
+      if (searching && !list.length) return ''; // 검색·필터 중엔 매칭 없는 반 숨김
+      const open = searching ? true : Views._stOpen.has(c.id);
+      return groupHTML(c.id, c.name, `${U.esc(c.day)}요일 ${c.time}`, list, open);
+    }).join('');
+
+    // 어느 강좌에도 등록되지 않은 학생
+    const enrolledIds = new Set(App.db.enrollments.map(e => e.studentId));
+    const unassigned = base.filter(s => !enrolledIds.has(s.id));
+    if (unassigned.length) html += groupHTML('__none', '강좌 미배정', '', unassigned, searching ? true : Views._stOpen.has('__none'));
+
+    document.getElementById('st-groups').innerHTML = html ||
+      '<div class="card p-8 text-center text-on-surface-variant text-[13px]">조건에 맞는 학생이 없습니다.</div>';
+
+    document.querySelectorAll('.st-grp').forEach(b => b.addEventListener('click', () => {
+      const cid = b.dataset.cid;
+      if (Views._stOpen.has(cid)) Views._stOpen.delete(cid); else Views._stOpen.add(cid);
+      draw();
+    }));
   }
-  ['st-search', 'st-course', 'st-status'].forEach(id => document.getElementById(id).addEventListener('input', draw));
+  ['st-search', 'st-status'].forEach(id => document.getElementById(id).addEventListener('input', draw));
   draw();
 };
 
