@@ -23,6 +23,7 @@ var TABS = {
 
 function initSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  try { ss.setSpreadsheetTimeZone('Asia/Seoul'); } catch (e) { }
   Object.keys(TABS).forEach(function (name) {
     var sh = ss.getSheetByName(name) || ss.insertSheet(name);
     if (sh.getLastRow() === 0) sh.appendRow(TABS[name]);
@@ -47,7 +48,8 @@ function readAll_() {
       var o = {};
       header.forEach(function (h, i) {
         var v = r[i];
-        if (v instanceof Date) v = Utilities.formatDate(v, 'Asia/Seoul', h === 'ts' ? "yyyy-MM-dd'T'HH:mm:ss" : 'yyyy-MM-dd');
+        // 주의: getValues()의 Date는 다른 컨텍스트 객체라 instanceof가 실패할 수 있음 → toString 판별
+        if (Object.prototype.toString.call(v) === '[object Date]') v = Utilities.formatDate(v, 'Asia/Seoul', h === 'ts' ? "yyyy-MM-dd'T'HH:mm:ss" : 'yyyy-MM-dd');
         if (h === 'isVideo') v = (v === true || v === 'TRUE' || v === 'true');
         if (h === 'delivery' && typeof v === 'string' && v) { try { v = JSON.parse(v); } catch (err) { /* 문자열 그대로 */ } }
         if (h === 'no' || h === 'sessionsCount') v = Number(v) || 0;
