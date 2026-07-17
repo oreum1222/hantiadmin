@@ -14,12 +14,13 @@
 var TABS = {
   courses: ['id', 'name', 'grade', 'kind', 'day', 'time', 'room', 'sessionsCount', 'openDate', 'staff', 'material'],
   sessions: ['id', 'courseId', 'no', 'date', 'topic', 'isVideo'],
-  students: ['id', 'name', 'school', 'grade', 'phone', 'parentPhone', 'note', 'consult', 'status', 'createdAt'],
+  students: ['id', 'name', 'school', 'grade', 'phone', 'parentPhone', 'note', 'consult', 'qna', 'status', 'createdAt'],
   enrollments: ['id', 'studentId', 'courseId', 'date'],
   attendance: ['id', 'sessionId', 'studentId', 'status', 'memo', 'by', 'ts'],
   makeups: ['id', 'studentId', 'sessionId', 'courseId', 'status', 'method', 'memo', 'by', 'ts', 'doneAt'],
   notices: ['id', 'date', 'title', 'body', 'channel', 'courseIds', 'by', 'ts', 'delivery'],
   tasks: ['id', 'title', 'detail', 'assignee', 'due', 'status', 'by', 'doneBy', 'doneAt', 'ts'],
+  leads: ['id', 'name', 'phone', 'grade', 'via', 'summary', 'status', 'date', 'by', 'memo', 'ts'],
 };
 
 function initSheets() {
@@ -27,7 +28,11 @@ function initSheets() {
   try { ss.setSpreadsheetTimeZone('Asia/Seoul'); } catch (e) { }
   Object.keys(TABS).forEach(function (name) {
     var sh = ss.getSheetByName(name) || ss.insertSheet(name);
-    if (sh.getLastRow() === 0) sh.appendRow(TABS[name]);
+    if (sh.getLastRow() === 0) { sh.appendRow(TABS[name]); return; }
+    // 헤더 조정: TABS에 있으나 시트에 없는 컬럼을 뒤에 추가(스키마 확장 대응)
+    var hdr = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+    var missing = TABS[name].filter(function (h) { return hdr.indexOf(h) < 0; });
+    if (missing.length) sh.getRange(1, hdr.length + 1, 1, missing.length).setValues([missing]);
   });
 }
 
@@ -115,17 +120,25 @@ function findRow_(name, id) {
   for (var i = 0; i < ids.length; i++) if (String(ids[i][0]) === String(id)) return i + 2;
   return -1;
 }
-function toRow_(name, obj) { return TABS[name].map(function (h) { return obj[h] !== undefined ? obj[h] : ''; }); }
+// 시트의 실제 헤더 순서(스키마 확장으로 TABS와 순서가 달라도 안전). 헤더 없으면 TABS 폴백.
+function header_(name) {
+  var sh = sheet_(name);
+  if (!sh || sh.getLastColumn() === 0) return TABS[name].slice();
+  var h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+  return h.filter(function (x) { return x !== ''; });
+}
+function toRow_(name, obj, hdr) { hdr = hdr || header_(name); return hdr.map(function (h) { return obj[h] !== undefined ? obj[h] : ''; }); }
 function upsert_(name, obj) {
   var sh = sheet_(name);
+  var hdr = header_(name);
   var row = obj.id ? findRow_(name, obj.id) : -1;
   if (row > 0) {
-    // 기존 값 유지 병합
-    var cur = sh.getRange(row, 1, 1, TABS[name].length).getValues()[0];
-    TABS[name].forEach(function (h, i) { if (obj[h] === undefined) obj[h] = cur[i]; });
-    sh.getRange(row, 1, 1, TABS[name].length).setValues([toRow_(name, obj)]);
+    // 기존 값 유지 병합 (시트 헤더 순서 기준)
+    var cur = sh.getRange(row, 1, 1, hdr.length).getValues()[0];
+    hdr.forEach(function (h, i) { if (obj[h] === undefined) obj[h] = cur[i]; });
+    sh.getRange(row, 1, 1, hdr.length).setValues([toRow_(name, obj, hdr)]);
   } else {
-    sh.appendRow(toRow_(name, obj));
+    sh.appendRow(toRow_(name, obj, hdr));
   }
   return obj;
 }
@@ -207,6 +220,12 @@ function applyAction_(action, p, role) {
       return upsert_('tasks', p);
     case 'deleteTask':
       remove_('tasks', function (o) { return o.id === p.id; });
+      return true;
+    case 'upsertLead':
+      if (!p.id) { p.id = 'l-' + uid_(); p.ts = now_(); if (!p.status) p.status = '신규'; }
+      return upsert_('leads', p);
+    case 'deleteLead':
+      remove_('leads', function (o) { return o.id === p.id; });
       return true;
     case 'bulkImport': {
       // 초기 1회 데이터 적재(마스터 전용). 이미 데이터가 있는 탭은 건너뜀.

@@ -58,5 +58,9 @@ window.SEED = (function () {
     { id: 'dt1', title: '데모 업무: 2회차 복사물 확인', detail: '데모 항목입니다.', assignee: '전체(모두)', due: '', status: '대기', by: '가경T', doneBy: '', doneAt: '', ts: '2026-07-12T00:00:00' },
   ];
 
-  return { courses, sessions, students, enrollments, attendance, makeups, notices, tasks };
+  const leads = [
+    { id: 'dl1', name: '데모 문의자', phone: '', grade: '', via: '카톡 채널', summary: '데모 신규 문의 예시입니다.', status: '신규', date: '2026-07-12', by: '가경T', memo: '', ts: '2026-07-12T00:00:00' },
+  ];
+
+  return { courses, sessions, students, enrollments, attendance, makeups, notices, tasks, leads };
 })();

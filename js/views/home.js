@@ -99,6 +99,10 @@ Views.home = function (el) {
         </div>`;
       }).join('')}
     </section>
+
+    <!-- 신규 문의 -->
+    ${window.Leads ? Leads.homeCard() : ''}
+
     <!-- 최근 공지 -->
     <section class="card p-5 lg:col-span-2">
       <div class="flex items-center justify-between mb-3">
