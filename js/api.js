@@ -149,6 +149,15 @@ window.Api = (function () {
         db.tasks = (db.tasks || []).filter(x => x.id !== p.id);
         return true;
       }
+      case 'upsertLead': {
+        if (!db.leads) db.leads = [];
+        if (!p.id) { p.id = 'l-' + uid(); p.ts = new Date().toISOString(); if (!p.status) p.status = '신규'; }
+        return upsert(db.leads, p);
+      }
+      case 'deleteLead': {
+        db.leads = (db.leads || []).filter(x => x.id !== p.id);
+        return true;
+      }
       default: throw new Error('알 수 없는 액션: ' + action);
     }
   }

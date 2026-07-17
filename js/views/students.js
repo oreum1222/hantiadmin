@@ -145,6 +145,12 @@ function renderStudent(el, studentId) {
       <p class="text-on-surface-variant text-[13px] leading-relaxed whitespace-pre-wrap">${U.esc(s.consult)}</p>
     </section>` : ''}
 
+    ${s.qna ? `
+    <section class="card p-5 lg:col-span-2">
+      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">chat</span>카톡 문의 · 질답</h2>
+      <p class="text-on-surface-variant text-[13px] leading-relaxed whitespace-pre-wrap">${U.esc(s.qna)}</p>
+    </section>` : ''}
+
     <section class="card p-5 lg:col-span-2">
       <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">insights</span>학습 성향 진단 <span class="text-on-surface-variant font-normal text-[13px]">(온라인 3종 + 대면)</span></h2>
       <div id="fa-diag"><p class="text-on-surface-variant text-[13px] py-2">불러오는 중…</p></div>
@@ -185,6 +191,7 @@ Views._studentForm = function (studentId) {
       <div><label class="lbl">학부모 연락처</label><input id="stf-pphone" class="fld" value="${U.esc(s.parentPhone)}" placeholder="010-"/></div>
       <div class="col-span-2"><label class="lbl">특이사항</label><textarea id="stf-note" class="fld" rows="2">${U.esc(s.note)}</textarea></div>
       <div class="col-span-2"><label class="lbl">상담 기록</label><textarea id="stf-consult" class="fld" rows="4">${U.esc(s.consult || '')}</textarea></div>
+      <div class="col-span-2"><label class="lbl">카톡 문의 · 질답</label><textarea id="stf-qna" class="fld" rows="3" placeholder="카톡 채널로 받은 질문·응답을 날짜와 함께 누적">${U.esc(s.qna || '')}</textarea></div>
     </div>
     <div class="flex justify-end gap-2 mt-5">
       <button class="btn btn-ghost" onclick="App.closeModal()">취소</button>
@@ -193,7 +200,7 @@ Views._studentForm = function (studentId) {
   document.getElementById('stf-save').onclick = async () => {
     const v = id => document.getElementById(id).value.trim();
     if (!v('stf-name')) return App.toast('이름을 입력하세요.', 'err');
-    const ok = await App.act('upsertStudent', { id: studentId || '', name: v('stf-name'), school: v('stf-school'), grade: v('stf-grade'), phone: v('stf-phone'), parentPhone: v('stf-pphone'), note: v('stf-note'), consult: document.getElementById('stf-consult').value.trim(), status: v('stf-status'), ...(studentId ? { createdAt: App.studentOf(studentId).createdAt } : {}) }, '학생 정보를 저장했습니다.');
+    const ok = await App.act('upsertStudent', { id: studentId || '', name: v('stf-name'), school: v('stf-school'), grade: v('stf-grade'), phone: v('stf-phone'), parentPhone: v('stf-pphone'), note: v('stf-note'), consult: document.getElementById('stf-consult').value.trim(), qna: document.getElementById('stf-qna').value.trim(), status: v('stf-status'), ...(studentId ? { createdAt: App.studentOf(studentId).createdAt } : {}) }, '학생 정보를 저장했습니다.');
     if (ok) { App.closeModal(); App.refresh(); }
   };
 };
