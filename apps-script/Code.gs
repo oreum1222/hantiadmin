@@ -19,6 +19,7 @@ var TABS = {
   attendance: ['id', 'sessionId', 'studentId', 'status', 'memo', 'by', 'ts'],
   makeups: ['id', 'studentId', 'sessionId', 'courseId', 'status', 'method', 'memo', 'by', 'ts', 'doneAt'],
   notices: ['id', 'date', 'title', 'body', 'channel', 'courseIds', 'by', 'ts', 'delivery'],
+  tasks: ['id', 'title', 'detail', 'assignee', 'due', 'status', 'by', 'doneBy', 'doneAt', 'ts'],
 };
 
 function initSheets() {
@@ -200,6 +201,12 @@ function applyAction_(action, p, role) {
       return upsert_('notices', p);
     case 'deleteNotice':
       remove_('notices', function (o) { return o.id === p.id; });
+      return true;
+    case 'upsertTask':
+      if (!p.id) { p.id = 't-' + uid_(); p.ts = now_(); if (!p.status) p.status = '대기'; }
+      return upsert_('tasks', p);
+    case 'deleteTask':
+      remove_('tasks', function (o) { return o.id === p.id; });
       return true;
     case 'bulkImport': {
       // 초기 1회 데이터 적재(마스터 전용). 이미 데이터가 있는 탭은 건너뜀.
