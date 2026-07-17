@@ -82,6 +82,7 @@ window.App = {
     { id: 'attendance', label: '출결', icon: 'fact_check' },
     { id: 'makeup', label: '보강', icon: 'event_repeat' },
     { id: 'notices', label: '공지', icon: 'campaign' },
+    { id: 'tasks', label: '조교 확인', icon: 'checklist' },
   ],
   navigate(view) { location.hash = '#' + view; },
   render() {

@@ -54,5 +54,9 @@ window.SEED = (function () {
     { id: 'dn1', date: '2026-07-12', title: '데모 공지', channel: '문자', courseIds: 'all', by: '가경T', ts: '2026-07-12T18:30:00', body: '데모 모드 공지 예시입니다. 실데이터는 라이브 모드에서 표시됩니다.' },
   ];
 
-  return { courses, sessions, students, enrollments, attendance, makeups, notices };
+  const tasks = [
+    { id: 'dt1', title: '데모 업무: 2회차 복사물 확인', detail: '데모 항목입니다.', assignee: '전체(모두)', due: '', status: '대기', by: '가경T', doneBy: '', doneAt: '', ts: '2026-07-12T00:00:00' },
+  ];
+
+  return { courses, sessions, students, enrollments, attendance, makeups, notices, tasks };
 })();

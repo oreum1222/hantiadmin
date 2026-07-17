@@ -140,6 +140,15 @@ window.Api = (function () {
         db.notices = db.notices.filter(x => x.id !== p.id);
         return true;
       }
+      case 'upsertTask': {
+        if (!db.tasks) db.tasks = [];
+        if (!p.id) { p.id = 't-' + uid(); p.ts = new Date().toISOString(); if (!p.status) p.status = '대기'; }
+        return upsert(db.tasks, p);
+      }
+      case 'deleteTask': {
+        db.tasks = (db.tasks || []).filter(x => x.id !== p.id);
+        return true;
+      }
       default: throw new Error('알 수 없는 액션: ' + action);
     }
   }
