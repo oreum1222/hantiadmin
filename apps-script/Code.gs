@@ -13,7 +13,7 @@
 
 var TABS = {
   courses: ['id', 'name', 'grade', 'kind', 'day', 'time', 'room', 'sessionsCount', 'openDate', 'staff', 'material'],
-  sessions: ['id', 'courseId', 'no', 'date', 'topic', 'isVideo'],
+  sessions: ['id', 'courseId', 'no', 'date', 'topic', 'isVideo', 'memo'],
   students: ['id', 'name', 'school', 'grade', 'phone', 'parentPhone', 'note', 'consult', 'qna', 'status', 'createdAt'],
   enrollments: ['id', 'studentId', 'courseId', 'date'],
   attendance: ['id', 'sessionId', 'studentId', 'status', 'memo', 'by', 'ts'],

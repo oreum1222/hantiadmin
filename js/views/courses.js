@@ -65,17 +65,24 @@ function renderDetail(el, courseId) {
         <button class="btn btn-ghost !py-1.5 !px-3 text-[12px]" onclick="Views._sessionForm('${c.id}')"><span class="material-symbols-outlined text-[16px]">add</span>회차 추가</button>
       </div>
       <div class="overflow-x-auto"><table class="tbl">
-        <thead><tr><th class="w-12">회차</th><th class="w-24">날짜</th><th>진도</th><th class="w-20">출결</th><th class="w-10"></th></tr></thead>
+        <thead><tr><th class="w-12">회차</th><th class="w-24">날짜</th><th>진도</th><th class="w-20">출결</th><th class="w-16"></th></tr></thead>
         <tbody>${sessions.map(s => {
           const recs = App.attOf(s.id);
           const isPast = s.date && s.date <= U.today();
-          return `<tr>
+          const hasMemo = !!(s.memo && String(s.memo).trim());
+          return `<tr class="${hasMemo ? '!border-b-0' : ''}">
             <td class="font-bold">${s.isVideo ? '<span class="material-symbols-outlined text-[18px] text-purple-400">smart_display</span>' : s.no}</td>
             <td class="${isPast ? '' : 'text-on-surface-variant'}">${U.fmtD(s.date)}</td>
             <td class="text-[13px]">${U.esc(s.topic)}</td>
             <td>${s.isVideo ? '<span class="text-on-surface-variant text-[12px]">—</span>' : recs.length ? `<button class="text-secondary text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">${recs.length}명 ✓</button>` : isPast ? `<button class="text-yellow-500 text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">미체크</button>` : '<span class="text-on-surface-variant text-[12px]">예정</span>'}</td>
-            <td><button class="text-on-surface-variant hover:text-on-surface" onclick="Views._sessionForm('${c.id}','${s.id}')" title="회차 수정"><span class="material-symbols-outlined text-[18px]">edit</span></button></td>
-          </tr>`;
+            <td class="whitespace-nowrap">
+              <button class="${hasMemo ? 'text-secondary' : 'text-on-surface-variant'} hover:text-secondary align-middle" onclick="Views._sessionMemo('${c.id}','${s.id}')" title="${hasMemo ? '회차 메모 보기·추가' : '회차 메모 추가'}"><span class="material-symbols-outlined text-[18px]">sticky_note_2</span></button>
+              <button class="text-on-surface-variant hover:text-on-surface align-middle ml-1" onclick="Views._sessionForm('${c.id}','${s.id}')" title="회차 수정"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+            </td>
+          </tr>
+          ${hasMemo ? `<tr><td colspan="5" class="!pt-0">
+            <div class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-[12.5px] text-on-surface-variant leading-relaxed whitespace-pre-wrap row-click" onclick="Views._sessionMemo('${c.id}','${s.id}')">${U.esc(s.memo)}</div>
+          </td></tr>` : ''}`;
         }).join('')}</tbody>
       </table></div>
     </section>
@@ -128,6 +135,50 @@ Views._courseForm = function (courseId) {
     const v = id => document.getElementById(id).value.trim();
     if (!v('cf-name')) return App.toast('강좌명을 입력하세요.', 'err');
     const ok = await App.act('upsertCourse', { id: courseId || '', name: v('cf-name'), grade: v('cf-grade'), kind: v('cf-kind'), day: v('cf-day'), time: v('cf-time'), room: v('cf-room'), sessionsCount: +v('cf-cnt') || 0, openDate: v('cf-open'), staff: v('cf-staff'), material: v('cf-mat') }, '강좌를 저장했습니다.');
+    if (ok) { App.closeModal(); App.refresh(); }
+  };
+};
+
+// ── 회차 메모 모달 (조교 공용 기록장 — 카톡 대신 회차별로 모아두기) ──
+Views._sessionMemo = function (courseId, sessionId) {
+  const s = App.sessionOf(sessionId);
+  if (!s) return;
+  const c = App.courseOf(courseId);
+  const me = localStorage.getItem('hanti-admin-worker') || (App.role === 'master' ? '가경T' : CONFIG.STAFF[1] || '조교');
+  App.modal(`
+    <h3 class="font-extrabold text-lg mb-1">회차 메모</h3>
+    <p class="text-on-surface-variant text-[13px] mb-4">${U.esc(c ? c.name : '')} · <b>${s.no}회차</b> ${U.fmtD(s.date)}${s.topic ? ' · ' + U.esc(s.topic) : ''}</p>
+
+    <div class="flex items-center gap-2 mb-2 flex-wrap">
+      <span class="text-[12px] text-on-surface-variant">작성자</span>
+      <select id="sm-who" class="fld !w-auto !py-1 text-[13px]">${CONFIG.STAFF.map(x => `<option ${x === me ? 'selected' : ''}>${x}</option>`).join('')}</select>
+      <button class="btn btn-ghost !py-1 !px-2.5 text-[12px]" id="sm-stamp"><span class="material-symbols-outlined text-[15px]">add</span>이름·날짜 줄 추가</button>
+    </div>
+    <textarea id="sm-memo" class="fld" rows="9" placeholder="이 회차에 대한 메모를 남기세요. (수업 특이사항, 배부 자료, 다음 주 준비물, 학생 관찰 등)">${U.esc(s.memo || '')}</textarea>
+    <p class="text-on-surface-variant text-[11.5px] mt-1.5">여러 조교가 함께 씁니다. 지우지 말고 아래에 이어서 적어 주세요.</p>
+
+    <div class="flex justify-between gap-2 mt-5">
+      <button class="btn btn-danger" id="sm-clear">전체 지우기</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="App.closeModal()">취소</button>
+        <button class="btn btn-primary" id="sm-save">저장</button>
+      </div>
+    </div>`);
+
+  const ta = document.getElementById('sm-memo');
+  document.getElementById('sm-stamp').onclick = () => {
+    const who = document.getElementById('sm-who').value;
+    localStorage.setItem('hanti-admin-worker', who);
+    const d = new Date();
+    const head = `[${who} · ${d.getMonth() + 1}/${d.getDate()}] `;
+    const cur = ta.value.replace(/\s+$/, '');
+    ta.value = (cur ? cur + '\n' : '') + head;
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = ta.value.length;
+  };
+  document.getElementById('sm-clear').onclick = () => { ta.value = ''; ta.focus(); };
+  document.getElementById('sm-save').onclick = async () => {
+    const ok = await App.act('upsertSession', { id: sessionId, courseId, memo: ta.value.trim() }, '회차 메모를 저장했습니다.');
     if (ok) { App.closeModal(); App.refresh(); }
   };
 };
