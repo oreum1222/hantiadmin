@@ -15,7 +15,7 @@ Views.students = function (el) {
   <div class="card p-4 mb-4 flex flex-wrap gap-3 items-center">
     <div class="relative flex-1 min-w-[200px]">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
-      <input id="st-search" class="fld !pl-10" placeholder="이름·학교로 검색"/>
+      <input id="st-search" class="fld !pl-10" placeholder="이름·학교·번호로 검색 (학생/학부모)"/>
     </div>
     <select id="st-status" class="fld !w-auto">
       <option value="">전체 상태</option><option>재원</option><option>휴원</option>
@@ -61,7 +61,11 @@ Views.students = function (el) {
     const q = document.getElementById('st-search').value.trim();
     const fs = document.getElementById('st-status').value;
     let base = [...App.db.students].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-    if (q) base = base.filter(s => s.name.includes(q) || s.school.includes(q));
+    if (q) {
+      const qd = q.replace(/\D/g, '');
+      base = base.filter(s => s.name.includes(q) || (s.school || '').includes(q)
+        || (qd.length >= 2 && ((s.phone || '').replace(/\D/g, '').includes(qd) || (s.parentPhone || '').replace(/\D/g, '').includes(qd))));
+    }
     if (fs) base = base.filter(s => s.status === fs);
     const okIds = new Set(base.map(s => s.id));
     const searching = !!(q || fs);
