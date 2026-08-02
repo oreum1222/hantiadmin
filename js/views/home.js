@@ -31,6 +31,18 @@ Views.home = function (el) {
     </div>
   </div>
 
+  <!-- 복습시험 대시보드 바로가기 -->
+  <a href="https://oreum1222.github.io/oreum-study/dashboard.html" target="_blank" rel="noopener" class="card p-5 mb-6 flex items-center justify-between gap-4 row-click no-underline">
+    <div class="flex items-center gap-4 min-w-0">
+      <div class="w-11 h-11 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined">quiz</span></div>
+      <div class="min-w-0">
+        <div class="font-bold text-[15px]">복습시험 결과 대시보드</div>
+        <div class="text-on-surface-variant text-[13px] mt-0.5">반별·주차별 응시 현황과 성적을 확인하고, 고1 종합반 결과 문자를 발송합니다.</div>
+      </div>
+    </div>
+    <span class="btn btn-primary shrink-0"><span class="material-symbols-outlined text-[18px]">open_in_new</span>바로가기</span>
+  </a>
+
   <!-- 요약 스탯 -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
     ${statCard('school', '오늘 수업', todaySessions.length + '개', todaySessions.length ? todaySessions.map(x => x.c.grade).join(' · ') : '수업 없는 날')}
@@ -121,11 +133,33 @@ Views.home = function (el) {
     </section>
   </div>
 
+  <!-- 빠른 연결: 외부 운영 도구 (조교팀 공용) -->
+  <div class="mt-4 card p-5">
+    <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">apps</span>빠른 연결</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      ${linkTile('fact_check', '과제 검사 대시보드', '제출·채점·리포트 (선생/조교)', CONFIG.HOMEWORK_DASHBOARD)}
+      ${linkTile('school', '과제 검사 학생 페이지', '학생 제출 화면', CONFIG.HOMEWORK_SITE)}
+      ${linkTile('psychology', '학습 성향 진단', 'fassessment 결과', CONFIG.FASSESSMENT_SITE)}
+    </div>
+  </div>
+
   <!-- 2차 예정 영역 자리 -->
   <div class="mt-4 card p-4 border-dashed !bg-transparent flex items-center gap-3 text-on-surface-variant text-[13px]">
     <span class="material-symbols-outlined text-[18px]">construction</span>
-    숙제 · 성적 · 상담 · 클리닉 · 통계 위젯은 이후 구축에서 이 자리에 추가됩니다.
+    성적 · 상담 · 클리닉 · 통계 위젯은 이후 구축에서 이 자리에 추가됩니다.
   </div>`;
+
+  function linkTile(icon, title, desc, url) {
+    if (!url) return '';
+    return `<a href="${url}" target="_blank" rel="noopener" class="card card-hover p-4 flex items-center gap-3 !no-underline">
+      <span class="material-symbols-outlined text-secondary text-[24px]">${icon}</span>
+      <div class="min-w-0 flex-1">
+        <div class="font-bold text-[14px] truncate">${title}</div>
+        <div class="text-on-surface-variant text-[12px] truncate">${desc}</div>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant text-[18px]">open_in_new</span>
+    </a>`;
+  }
 
   function statCard(icon, label, value, sub) {
     return `<div class="card p-4">

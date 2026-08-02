@@ -9,6 +9,10 @@ window.CONFIG = {
   FASSESSMENT_KEY: '',  // ⚠️ 공개 저장소이므로 키를 여기 두지 말 것 (백엔드 릴레이 사용)
   FASSESSMENT_SITE: 'https://oreum1222.github.io/oreum-fassessment/',
 
+  // 과제 검사 시스템(가경T) — 조교/선생 대시보드 + 학생 제출 페이지
+  HOMEWORK_DASHBOARD: 'https://oreum1222.github.io/homework/dashboard.html',
+  HOMEWORK_SITE: 'https://oreum1222.github.io/homework/',
+
   // 데모 모드 전용 PIN (라이브 모드에서는 서버에서 검증 — 실제 PIN을 여기 두지 말 것)
   DEMO_PIN_MASTER: '0000',
   DEMO_PIN_STAFF: '1111',
