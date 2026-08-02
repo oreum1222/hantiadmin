@@ -83,11 +83,13 @@ window.App = {
     { id: 'makeup', label: '보강', icon: 'event_repeat' },
     { id: 'notices', label: '공지', icon: 'campaign' },
     { id: 'tasks', label: '조교 확인', icon: 'checklist' },
+    { id: 'diagnosis', label: '성향 진단', icon: 'psychology', url: 'https://oreum1222.github.io/oreum-fassessment/dashboard.html' },
+    { id: 'review', label: '복습시험', icon: 'quiz', url: 'https://oreum1222.github.io/oreum-study/dashboard.html' },
   ],
   navigate(view) { location.hash = '#' + view; },
   render() {
     const hash = (location.hash || '#home').slice(1).split('/')[0];
-    App.view = App.MENUS.some(m => m.id === hash) ? hash : 'home';
+    App.view = App.MENUS.some(m => m.id === hash && !m.url) ? hash : 'home';
     // 네비 활성 표시
     document.querySelectorAll('#side-nav .nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === App.view));
     document.querySelectorAll('#bottom-nav .bottom-nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === App.view));
@@ -113,10 +115,15 @@ window.App = {
   // 네비 구성
   const sideNav = document.getElementById('side-nav');
   sideNav.innerHTML = App.MENUS.map(m =>
-    `<div class="nav-item" data-view="${m.id}"><span class="material-symbols-outlined text-[20px]">${m.icon}</span>${m.label}</div>`).join('');
+    m.url
+      ? `<a class="nav-item" href="${m.url}" target="_blank" rel="noopener"><span class="material-symbols-outlined text-[20px]">${m.icon}</span>${m.label}<span class="material-symbols-outlined text-[15px] ml-auto opacity-60">open_in_new</span></a>`
+      : `<div class="nav-item" data-view="${m.id}"><span class="material-symbols-outlined text-[20px]">${m.icon}</span>${m.label}</div>`).join('');
   const bottomNav = document.getElementById('bottom-nav');
   bottomNav.innerHTML = App.MENUS.map(m =>
-    `<div class="bottom-nav-item" data-view="${m.id}"><span class="material-symbols-outlined text-[22px]">${m.icon}</span>${m.label}</div>`).join('');
+    m.url
+      ? `<a class="bottom-nav-item" href="${m.url}" target="_blank" rel="noopener"><span class="material-symbols-outlined text-[22px]">${m.icon}</span>${m.label}</a>`
+      : `<div class="bottom-nav-item" data-view="${m.id}"><span class="material-symbols-outlined text-[22px]">${m.icon}</span>${m.label}</div>`).join('');
+  bottomNav.style.gridTemplateColumns = `repeat(${App.MENUS.length}, minmax(0, 1fr))`; // 메뉴 수에 맞춰 열 수 자동 조정
   document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => App.navigate(el.dataset.view)));
 
   // 테마 토글
