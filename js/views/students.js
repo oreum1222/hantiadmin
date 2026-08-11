@@ -143,6 +143,8 @@ function renderStudent(el, studentId) {
       }).join('') : '<p class="text-on-surface-variant text-[13px] py-3">보강 이력이 없습니다.</p>'}
     </section>
 
+    ${Views._reviewHTML(s)}
+
     ${s.consult ? `
     <section class="card p-5 lg:col-span-2">
       <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">forum</span>첫수업 대면 상담 <span class="text-on-surface-variant font-normal text-[13px]">(7/12 상담지)</span></h2>
@@ -180,6 +182,33 @@ function renderStudent(el, studentId) {
 
   Views._fillDiag(s);
 }
+
+// ── 복습시험 · 숙제 결과 섹션 ──
+Views._rvPill = function (k, v) {
+  const cls = (v == null) ? 'text-on-surface-variant border-outline-variant'
+    : (v >= 80) ? 'text-secondary border-secondary/30 bg-secondary-fixed/50'
+      : (v >= 60) ? 'text-yellow-600 border-yellow-500/40 bg-yellow-500/10'
+        : 'text-red-400 border-red-400/30 bg-red-400/10';
+  return `<span class="chip border ${cls}">${U.esc(k)} ${v == null ? '미응시' : v + '%'}</span>`;
+};
+Views._reviewHTML = function (s) {
+  const rv = (window.REVIEW || {})[s.id];
+  if (!rv) return '';
+  const isWork = rv.type === '본문 해석 복습';
+  const pills = (rv.items || []).map(it => Views._rvPill(it.k, it.v)).join('');
+  const hasAny = pills || rv.weak || (rv.hw && rv.hw.length) || rv.note;
+  if (!hasAny) return '';
+  return `
+    <section class="card p-5 lg:col-span-2">
+      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">fact_check</span>복습시험 · 숙제 결과 <span class="text-on-surface-variant font-normal text-[13px]">(${U.esc(rv.course)}${rv.type ? ' · ' + U.esc(rv.type) : ''})</span></h2>
+      ${rv.note ? `<p class="text-on-surface-variant text-[13px] mb-2">${U.esc(rv.note)}</p>` : ''}
+      ${isWork ? `<div class="flex flex-wrap items-center gap-2 mb-2.5 text-[13px]"><span class="font-bold text-[14px]">평균 ${rv.avg == null ? '—' : rv.avg + '%'}</span><span class="text-on-surface-variant">· 응시 ${rv.takeN || 0}작품</span></div>` : ''}
+      ${pills ? `<div class="flex flex-wrap gap-1.5 mb-3">${pills}</div>` : ''}
+      ${(!isWork && rv.take) ? `<div class="text-[13px] mb-1"><span class="text-on-surface-variant">응시</span> <b>${U.esc(rv.take)}</b></div>` : ''}
+      ${rv.weak ? `<div class="text-[13px] mb-1"><span class="text-on-surface-variant">취약 · 특이</span> ${U.esc(rv.weak)}</div>` : ''}
+      ${(rv.hw && rv.hw.length) ? `<div class="mt-2.5"><div class="text-[13px] font-bold mb-1">숙제 검사</div><ul class="text-[13px] text-on-surface-variant space-y-1">${rv.hw.map(h => `<li>– ${U.esc(h)}</li>`).join('')}</ul></div>` : ''}
+    </section>`;
+};
 
 // ── 학생 추가/수정 모달 ──
 Views._studentForm = function (studentId) {
