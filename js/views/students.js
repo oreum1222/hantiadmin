@@ -70,17 +70,22 @@ Views.students = function (el) {
     const okIds = new Set(base.map(s => s.id));
     const searching = !!(q || fs);
 
-    let html = App.db.courses.map(c => {
+    const grp = c => {
       const list = App.enrolledStudents(c.id).filter(s => okIds.has(s.id));
       if (searching && !list.length) return ''; // 검색·필터 중엔 매칭 없는 반 숨김
       const open = searching ? true : Views._stOpen.has(c.id);
       return groupHTML(c.id, c.name, `${U.esc(c.day)}요일 ${c.time}`, list, open);
-    }).join('');
+    };
+    let html = App.activeCourses().map(grp).join('');
 
     // 어느 강좌에도 등록되지 않은 학생
     const enrolledIds = new Set(App.db.enrollments.map(e => e.studentId));
     const unassigned = base.filter(s => !enrolledIds.has(s.id));
     if (unassigned.length) html += groupHTML('__none', '강좌 미배정', '', unassigned, searching ? true : Views._stOpen.has('__none'));
+
+    // 종강 반은 토글 안으로
+    const endedHtml = App.endedCourses().map(grp).join('');
+    if (endedHtml) html += App.endedBox(App.endedCourses().length, `<div class="space-y-3">${endedHtml}</div>`, searching);
 
     document.getElementById('st-groups').innerHTML = html ||
       '<div class="card p-8 text-center text-on-surface-variant text-[13px]">조건에 맞는 학생이 없습니다.</div>';

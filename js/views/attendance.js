@@ -2,7 +2,10 @@
 // 해시: #attendance 또는 #attendance/<courseId>/<sessionId>
 Views.attendance = function (el) {
   const parts = location.hash.slice(1).split('/');
-  const courseId = parts[1] || App.db.courses[0]?.id || '';
+  // 기본 강좌: 회차가 있는 강좌 우선(진행 중 먼저) — 출결 체크할 회차가 있는 곳으로
+  const hasSess = c => App.sessionsOf(c.id).some(s => !s.isVideo);
+  const courseId = parts[1] ||
+    (App.activeCourses().find(hasSess) || App.db.courses.find(hasSess) || App.db.courses[0] || {}).id || '';
   const course = App.courseOf(courseId);
   const sessions = course ? App.sessionsOf(courseId).filter(s => !s.isVideo) : [];
   // 기본 선택: 지정된 회차 → 없으면 오늘 이전 가장 최근 회차
@@ -28,7 +31,12 @@ Views.attendance = function (el) {
 
   <div class="card p-4 mb-4 flex flex-wrap gap-3 items-center">
     <select id="at-course" class="fld !w-auto min-w-[220px]">
-      ${App.db.courses.map(c => `<option value="${c.id}" ${c.id === courseId ? 'selected' : ''}>${U.esc(c.name)}</option>`).join('')}
+      ${(() => {
+        const opt = c => `<option value="${c.id}" ${c.id === courseId ? 'selected' : ''}>${U.esc(c.name)}</option>`;
+        const act = App.activeCourses(), end = App.endedCourses();
+        return (act.length ? `<optgroup label="진행 중">${act.map(opt).join('')}</optgroup>` : '')
+          + (end.length ? `<optgroup label="종강">${end.map(opt).join('')}</optgroup>` : '');
+      })()}
     </select>
     <select id="at-session" class="fld !w-auto" ${sessions.length ? '' : 'disabled'}>
       ${sessions.map(s => `<option value="${s.id}" ${s.id === sessionId ? 'selected' : ''}>${s.no}회차 · ${U.fmtD(s.date)}</option>`).join('')}
