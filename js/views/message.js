@@ -47,6 +47,10 @@ Views.message = function (el) {
       <div class="card p-4">
         <div class="flex items-center gap-2 mb-2 flex-wrap">
           <span class="text-[13px] font-bold">본문</span>
+          <select id="msg-tmpl" class="fld !w-auto !py-1 text-[12px]">
+            <option value="">템플릿 불러오기…</option>
+            ${(window.MSG_TEMPLATES || []).map(t => `<option value="${t.id}">${U.esc(t.name)}</option>`).join('')}
+          </select>
           <button class="btn btn-ghost !py-1 !px-2 text-[12px] msg-var" data-v="#{이름}">이름 삽입</button>
           <button class="btn btn-ghost !py-1 !px-2 text-[12px] msg-var" data-v="#{학교}">학교 삽입</button>
           <span id="msg-bytes" class="ml-auto text-[12px] text-on-surface-variant"></span>
@@ -100,6 +104,13 @@ Views.message = function (el) {
     document.getElementById('msg-bytes').textContent = `${b} byte · ${b <= 90 ? 'SMS' : 'LMS'}`;
   }
   ta.addEventListener('input', () => { S.body = ta.value; bytes(); });
+  const tsel = document.getElementById('msg-tmpl');
+  if (tsel) tsel.addEventListener('change', () => {
+    const t = (window.MSG_TEMPLATES || []).find(x => x.id === tsel.value); tsel.value = '';
+    if (!t) return;
+    ta.value = t.body; S.body = ta.value; bytes(); ta.focus();
+    App.toast(ta.value ? '템플릿을 불러왔습니다. 필요하면 수정하세요.' : '', 'ok');
+  });
   document.querySelectorAll('.msg-var').forEach(b => b.addEventListener('click', () => {
     const v = b.dataset.v, p = ta.selectionStart;
     ta.value = ta.value.slice(0, p) + v + ta.value.slice(ta.selectionEnd);
