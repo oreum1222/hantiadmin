@@ -28,7 +28,7 @@ Views.makeup = function (el) {
     if (filter === '미완료') list = all.filter(x => x.m.status !== '완료');
     else if (filter !== '전체') list = all.filter(x => x.m.status === filter);
 
-    document.getElementById('mk-list').innerHTML = list.length ? list.map(({ m, st, ss, c }) => `
+    const card = ({ m, st, ss, c }) => `
       <div class="card p-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="min-w-0">
@@ -52,8 +52,18 @@ Views.makeup = function (el) {
             <button class="btn btn-ghost !py-1.5 !px-2.5 text-[12px] mk-edit" data-id="${m.id}" title="방식·메모"><span class="material-symbols-outlined text-[16px]">edit_note</span></button>
           </div>
         </div>
-      </div>`).join('')
-    : `<div class="card p-10 text-center text-on-surface-variant text-[14px]">${filter === '미완료' ? '미처리 보강이 없습니다. 👍' : '해당 상태의 보강이 없습니다.'}</div>`;
+      </div>`;
+    const act = list.filter(x => !App.courseEnded(x.c?.id));
+    const end = list.filter(x => App.courseEnded(x.c?.id));
+    let inner;
+    if (!act.length && !end.length) {
+      inner = `<div class="card p-10 text-center text-on-surface-variant text-[14px]">${filter === '미완료' ? '미처리 보강이 없습니다. 👍' : '해당 상태의 보강이 없습니다.'}</div>`;
+    } else {
+      inner = act.length ? `<div class="space-y-3">${act.map(card).join('')}</div>`
+        : '<div class="card p-6 text-center text-on-surface-variant text-[13px]">진행 중인 강좌의 보강은 없습니다.</div>';
+      if (end.length) inner += App.endedBox(end.length, `<div class="space-y-3">${end.map(card).join('')}</div>`);
+    }
+    document.getElementById('mk-list').innerHTML = inner;
 
     // 상태 진행
     document.querySelectorAll('.mk-step').forEach(b => b.addEventListener('click', async () => {

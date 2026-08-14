@@ -3,24 +3,17 @@ Views.courses = function (el) {
   const sub = (location.hash.split('/')[1] || ''); // #courses/h1 → 상세
   if (sub) return renderDetail(el, sub);
 
-  el.innerHTML = `
-  <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-    <div>
-      <h1 class="text-2xl font-extrabold tracking-tight">강의 관리</h1>
-      <p class="text-on-surface-variant text-[14px] mt-1">강좌 ${App.db.courses.length}개 운영 중</p>
-    </div>
-    <button class="btn btn-primary" onclick="Views._courseForm()"><span class="material-symbols-outlined text-[18px]">add</span>강좌 추가</button>
-  </div>
-  <div class="grid md:grid-cols-2 gap-4">
-    ${App.db.courses.map(c => {
-      const n = App.enrolledStudents(c.id).length;
-      const ss = App.sessionsOf(c.id);
-      const done = ss.filter(s => s.date && s.date <= U.today() && !s.isVideo).length;
-      const rate = App.attRate(c.id);
-      return `<div class="card card-hover p-5 cursor-pointer" onclick="location.hash='#courses/${c.id}'">
+  const card = c => {
+    const n = App.enrolledStudents(c.id).length;
+    const ss = App.sessionsOf(c.id);
+    const done = ss.filter(s => s.date && s.date <= U.today() && !s.isVideo).length;
+    const rate = App.attRate(c.id);
+    const ended = App.courseEnded(c.id);
+    return `<div class="card card-hover p-5 cursor-pointer ${ended ? 'opacity-80' : ''}" onclick="location.hash='#courses/${c.id}'">
         <div class="flex items-start justify-between gap-2">
           <div>
             <span class="chip border ${c.kind === '단과' ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-blue-400 border-blue-400/30 bg-blue-400/10'}">${U.esc(c.kind)}</span>
+            ${ended ? '<span class="chip border border-outline-variant text-on-surface-variant ml-1">종강</span>' : ''}
             <h3 class="font-bold text-[16px] mt-2">${U.esc(c.name)}</h3>
           </div>
           <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
@@ -34,8 +27,18 @@ Views.courses = function (el) {
           <span><b class="${rate === null ? 'text-on-surface-variant' : rate >= 90 ? 'text-secondary' : 'text-yellow-500'}">${rate === null ? '—' : rate + '%'}</b> <span class="text-on-surface-variant">출석률</span></span>
         </div>
       </div>`;
-    }).join('')}
-  </div>`;
+  };
+  const active = App.activeCourses(), ended = App.endedCourses();
+  el.innerHTML = `
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold tracking-tight">강의 관리</h1>
+      <p class="text-on-surface-variant text-[14px] mt-1">진행 ${active.length}개 · 종강 ${ended.length}개</p>
+    </div>
+    <button class="btn btn-primary" onclick="Views._courseForm()"><span class="material-symbols-outlined text-[18px]">add</span>강좌 추가</button>
+  </div>
+  <div class="grid md:grid-cols-2 gap-4">${active.length ? active.map(card).join('') : '<p class="text-on-surface-variant text-[13px]">진행 중인 강좌가 없습니다.</p>'}</div>
+  ${ended.length ? App.endedBox(ended.length, `<div class="grid md:grid-cols-2 gap-4">${ended.map(card).join('')}</div>`) : ''}`;
 };
 
 // ── 강좌 상세 ──

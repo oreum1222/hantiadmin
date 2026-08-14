@@ -43,6 +43,21 @@ window.App = {
     return Math.round(ok / recs.length * 100);
   },
 
+  // ── 진행/종강 강좌 구분 ──
+  courseEnded(id) { return (CONFIG.ENDED_COURSES || []).includes(id); },
+  activeCourses() { return App.db.courses.filter(c => !App.courseEnded(c.id)); },
+  endedCourses() { return App.db.courses.filter(c => App.courseEnded(c.id)); },
+  // 종강 항목을 접어두는 공용 토글 (클릭하면 펼쳐짐). opened=true면 기본 펼침.
+  endedBox(count, innerHTML, opened) {
+    return `<details class="group mt-4"${opened ? ' open' : ''}>
+      <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none rounded-xl border border-outline-variant bg-surface-container-low/40 hover:bg-surface-container-low transition-colors px-5 py-3.5 flex items-center justify-between gap-2">
+        <span class="flex items-center gap-2 font-bold text-[14px] text-on-surface-variant"><span class="material-symbols-outlined text-[19px]">inventory_2</span>종강 강좌 <span class="chip border border-outline-variant text-on-surface-variant">${count}</span><span class="text-[12px] font-normal opacity-70">클릭하여 펼치기</span></span>
+        <span class="material-symbols-outlined text-on-surface-variant transition-transform duration-200 group-open:rotate-180">expand_more</span>
+      </summary>
+      <div class="mt-3">${innerHTML}</div>
+    </details>`;
+  },
+
   // ── 액션 실행 (저장 중 토스트 → 성공/실패) ──
   async act(action, payload, okMsg) {
     try {
