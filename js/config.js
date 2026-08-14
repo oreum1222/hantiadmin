@@ -32,6 +32,15 @@ window.CONFIG = {
   // 종강(종료)된 강좌 id — 진행/종강 구분 토글에 사용. 강좌가 종강하면 여기에 id를 추가하세요.
   ENDED_COURSES: ['h1', 'h2', 'sm3', 'sh1'],
 
+  // ── 문자 발송 (Solapi 릴레이: hwsys 백엔드 재사용, API 키는 그쪽 GAS Script Properties에만) ──
+  SEND_URL: 'https://script.google.com/macros/s/AKfycbwQ30abPMwhN8OPS9FfaSIPwd3FtH6VLljuELWifzBwY_gr20Vh4kursrj8VNY_kgb9EA/exec',
+  // 발신번호 라우팅: MEXX 강좌는 한티 번호, 그 외(고3 오름 정규)는 오름 번호
+  SENDER_HANTI: '010-9279-9349',
+  SENDER_OREUM: '010-2452-7452',
+  MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3'],
+  // 백엔드가 senderKey별 발신번호 라우팅을 반영하면 true로. false면 한티(MEXX) 실발송을 막음(오름 번호 오발송 방지).
+  SEND_SENDER_ROUTING: false,
+
   // 신규 문의 진행 상태
   LEAD_STATUS: ['신규', '상담중', '등록', '미등록'],
 
