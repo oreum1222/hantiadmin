@@ -38,8 +38,8 @@ window.CONFIG = {
   SENDER_HANTI: '010-9279-9349',
   SENDER_OREUM: '010-2452-7452',
   MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3'],
-  // 백엔드가 senderKey별 발신번호 라우팅을 반영하면 true로. false면 한티(MEXX) 실발송을 막음(오름 번호 오발송 방지).
-  SEND_SENDER_ROUTING: false,
+  // 백엔드 senderFor_가 courseId 'hanti-' 접두로 한티 9279-9349 라우팅함(이미 반영됨). false면 한티 실발송 차단.
+  SEND_SENDER_ROUTING: true,
 
   // 신규 문의 진행 상태
   LEAD_STATUS: ['신규', '상담중', '등록', '미등록'],
