@@ -58,6 +58,22 @@ window.App = {
     </details>`;
   },
 
+  // ── 문자 발송 ──
+  // 강좌 → 발신 구분('hanti'|'oreum') 및 표시 번호
+  senderKeyOf(courseId) { return (CONFIG.MEXX_COURSES || []).includes(courseId) ? 'hanti' : 'oreum'; },
+  senderNumberOf(key) { return key === 'oreum' ? CONFIG.SENDER_OREUM : CONFIG.SENDER_HANTI; },
+  // Solapi 릴레이(hwsys)로 발송. dryRun=true면 실발송 없이 형식·대상만 확인.
+  async sendSMS(messages, dryRun) {
+    const res = await fetch(CONFIG.SEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
+      body: new URLSearchParams({ action: 'sendMessages', dryRun: dryRun ? '1' : '0', messages: JSON.stringify(messages) }),
+    });
+    return res.json();
+  },
+  // 문자 바이트 수(한글 2, 그 외 1) 및 SMS/LMS 판별
+  smsBytes(text) { let b = 0; for (const ch of String(text || '')) b += ch.charCodeAt(0) > 127 ? 2 : 1; return b; },
+
   // ── 액션 실행 (저장 중 토스트 → 성공/실패) ──
   async act(action, payload, okMsg) {
     try {
@@ -97,6 +113,7 @@ window.App = {
     { id: 'attendance', label: '출결', icon: 'fact_check' },
     { id: 'makeup', label: '보강', icon: 'event_repeat' },
     { id: 'notices', label: '공지', icon: 'campaign' },
+    { id: 'message', label: '문자 발송', icon: 'sms' },
     { id: 'tasks', label: '조교 확인', icon: 'checklist' },
     { id: 'diagnosis', label: '성향 진단', icon: 'psychology', url: 'https://oreum1222.github.io/oreum-fassessment/dashboard.html' },
     { id: 'review', label: '복습시험', icon: 'quiz', url: 'https://oreum1222.github.io/oreum-study/dashboard.html' },
