@@ -118,12 +118,14 @@ Views.message = function (el) {
       const s = App.studentOf(id); if (!s) return;
       const cid = (App.coursesOf(id)[0] || {}).id || '';
       const senderKey = App.senderKeyOf(cid);
+      // 백엔드 senderFor_는 courseId가 'hanti-'로 시작하면 한티 9279-9349로 라우팅
+      const sendCid = senderKey === 'hanti' ? 'hanti-' + cid : cid;
       const text = body.replace(/#\{이름\}/g, s.name).replace(/#\{학교\}/g, s.school || '');
       const nums = [];
       if (S.target === 'parent' || S.target === 'both') nums.push(['학부모', s.parentPhone]);
       if (S.target === 'student' || S.target === 'both') nums.push(['학생', s.phone]);
       nums.forEach(([who, ph]) => {
-        if (ph && ph.replace(/\D/g, '').length >= 9) msgs.push({ to: ph, text, name: s.name + '(' + who + ')', scenario: 'dashboard', courseId: cid, senderKey });
+        if (ph && ph.replace(/\D/g, '').length >= 9) msgs.push({ to: ph, text, name: s.name + '(' + who + ')', scenario: 'dashboard', courseId: sendCid, senderKey });
         else skipped.push(s.name + ' ' + who);
       });
     });
