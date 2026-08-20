@@ -8,7 +8,7 @@ window.U = {
   dayName(dateStr) { if (!dateStr) return ''; return ['일', '월', '화', '수', '목', '금', '토'][new Date(dateStr + 'T00:00:00').getDay()]; },
   fmtD(dateStr) { if (!dateStr) return '—'; const [y, m, d] = dateStr.split('-'); return `${+m}/${+d} (${U.dayName(dateStr)})`; },
   attChip(status) {
-    const map = { '출석': 'text-secondary bg-secondary-fixed/60 border-secondary/25', '지각': 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30', '결석': 'text-red-400 bg-red-400/10 border-red-400/30', '사유': 'text-blue-400 bg-blue-400/10 border-blue-400/30', '온라인': 'text-purple-400 bg-purple-400/10 border-purple-400/30' };
+    const map = { '출석': 'text-secondary bg-secondary-fixed/60 border-secondary/25', '지각': 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30', '결석': 'text-red-400 bg-red-400/10 border-red-400/30', '보강': 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30', '사유': 'text-blue-400 bg-blue-400/10 border-blue-400/30', '온라인': 'text-purple-400 bg-purple-400/10 border-purple-400/30' };
     return `<span class="chip border ${map[status] || 'text-on-surface-variant border-outline-variant'}">${U.esc(status)}</span>`;
   },
   mkChip(status) {
@@ -39,7 +39,7 @@ window.App = {
     const sids = App.sessionsOf(courseId).map(s => s.id);
     const recs = App.db.attendance.filter(a => sids.includes(a.sessionId));
     if (!recs.length) return null;
-    const ok = recs.filter(r => ['출석', '지각', '온라인'].includes(r.status)).length;
+    const ok = recs.filter(r => ['출석', '지각', '온라인', '보강'].includes(r.status)).length;
     return Math.round(ok / recs.length * 100);
   },
 
