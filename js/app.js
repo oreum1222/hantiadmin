@@ -25,7 +25,7 @@ window.App = {
   courseOf(id) { return App.db.courses.find(c => c.id === id); },
   studentOf(id) { return App.db.students.find(s => s.id === id); },
   sessionOf(id) { return App.db.sessions.find(s => s.id === id); },
-  sessionsOf(courseId) { return App.db.sessions.filter(s => s.courseId === courseId).sort((a, b) => a.no - b.no); },
+  sessionsOf(courseId) { return App.db.sessions.filter(s => s.courseId === courseId).sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.no - b.no)); },
   enrolledStudents(courseId) {
     return App.db.enrollments.filter(e => e.courseId === courseId)
       .map(e => App.studentOf(e.studentId)).filter(Boolean)
