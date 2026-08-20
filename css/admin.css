@@ -41,6 +41,7 @@ html.light .nav-item.active{background:rgb(var(--c-secondary-fixed));color:rgb(v
 .att-btn.on-출석{background:rgba(74,227,192,.16);border-color:rgba(74,227,192,.5);color:rgb(var(--c-secondary));}
 .att-btn.on-지각{background:rgba(250,204,21,.14);border-color:rgba(250,204,21,.45);color:#eab308;}
 .att-btn.on-결석{background:rgba(248,113,113,.14);border-color:rgba(248,113,113,.5);color:#f87171;}
+.att-btn.on-보강{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.5);color:#22d3ee;}
 .att-btn.on-사유{background:rgba(96,165,250,.14);border-color:rgba(96,165,250,.5);color:#60a5fa;}
 .att-btn.on-온라인{background:rgba(192,132,252,.14);border-color:rgba(192,132,252,.5);color:#c084fc;}
 
