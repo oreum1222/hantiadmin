@@ -37,7 +37,7 @@ window.CONFIG = {
   // 발신번호 라우팅: MEXX 강좌는 한티 번호, 그 외(고3 오름 정규)는 오름 번호
   SENDER_HANTI: '010-9279-9349',
   SENDER_OREUM: '010-2452-7452',
-  MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3'],
+  MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3', 'g2cs'],
   // 백엔드 senderFor_가 courseId 'hanti-' 접두로 한티 9279-9349 라우팅함(이미 반영됨). false면 한티 실발송 차단.
   SEND_SENDER_ROUTING: true,
 
