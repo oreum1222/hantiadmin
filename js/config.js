@@ -38,6 +38,13 @@ window.CONFIG = {
   SENDER_HANTI: '010-9279-9349',
   SENDER_OREUM: '010-2452-7452',
   MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3', 'g2cs'],
+
+  // 과제(숙제) 자동 연동: 대시보드 강좌 → 과제 검사 시스템(hwsys) courseId. 주차별 과제 범위를 라이브로 표시.
+  HW_COURSE_MAP: {
+    h1: 'hanti-dan-h1-gojeon', h2: 'hanti-dan-h2-hwaeon',
+    sh1: 'hanti-jong-h1-gojeonbeop', sm3: 'hanti-jong-m3-hyeonbeop',
+    g3f: 'go3-regular', g3s: 'go3-regular',
+  },
   // 백엔드 senderFor_가 courseId 'hanti-' 접두로 한티 9279-9349 라우팅함(이미 반영됨). false면 한티 실발송 차단.
   SEND_SENDER_ROUTING: true,
 

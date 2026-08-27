@@ -74,6 +74,28 @@ window.App = {
   // 문자 바이트 수(한글 2, 그 외 1) 및 SMS/LMS 판별
   smsBytes(text) { let b = 0; for (const ch of String(text || '')) b += ch.charCodeAt(0) > 127 ? 2 : 1; return b; },
 
+  // ── 과제(숙제) 라이브 연동: 과제 검사 시스템에서 주차별 과제 범위 조회(세션당 1회 캐시) ──
+  hwAssignments() {
+    if (!window.__HW_ASSIGN) {
+      window.__HW_ASSIGN = fetch(CONFIG.SEND_URL + '?action=list')
+        .then(r => r.json())
+        .then(list => {
+          const map = {}; // hwsysCourseId -> { week -> {label, area} }
+          (list || []).forEach(r => {
+            const cid = r.courseId, w = r.week, wl = r.weekLabel;
+            if (!cid || w == null || w === '' || !wl) return;
+            (map[cid] = map[cid] || {})[w] = { label: String(wl), area: r.area || '' };
+          });
+          const out = {};
+          Object.keys(map).forEach(cid => {
+            out[cid] = Object.keys(map[cid]).map(Number).sort((a, b) => a - b).map(w => ({ w, ...map[cid][w] }));
+          });
+          return out;
+        }).catch(() => ({}));
+    }
+    return window.__HW_ASSIGN;
+  },
+
   // ── 액션 실행 (저장 중 토스트 → 성공/실패) ──
   async act(action, payload, okMsg) {
     try {
