@@ -66,6 +66,7 @@ html.light .nav-item.active{background:rgb(var(--c-secondary-fixed));color:rgb(v
 .tbl tr:last-child td{border-bottom:none;}
 .row-click{cursor:pointer;transition:background .12s;}
 .row-click:hover{background:rgb(var(--c-surface-container-low));}
+.on-adm{background:rgb(var(--c-secondary-fixed)/.6);color:rgb(var(--c-secondary));font-weight:700;}
 
 /* 모달 · 토스트 */
 .modal-back{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:1rem;}
