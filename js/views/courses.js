@@ -108,7 +108,27 @@ function renderDetail(el, courseId) {
         </div>`;
       }).join('') : '<p class="text-on-surface-variant text-[13px] py-4">아직 등록된 수강생이 없습니다.</p>'}
     </section>
+
+    ${CONFIG.HW_COURSE_MAP[c.id] ? `
+    <section class="card p-5 lg:col-span-5">
+      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">assignment</span>주차별 과제(숙제) <span class="text-on-surface-variant font-normal text-[13px]">· 과제 검사 시스템 연동 (라이브)</span></h2>
+      <div id="hw-assign-list"><p class="text-on-surface-variant text-[13px] py-1">불러오는 중…</p></div>
+    </section>` : ''}
   </div>`;
+
+  // 과제(숙제) 라이브 연동 채우기 (과제 검사 시스템에서 주차별 과제 범위)
+  if (CONFIG.HW_COURSE_MAP[c.id]) {
+    App.hwAssignments().then(map => {
+      const box = document.getElementById('hw-assign-list'); if (!box) return;
+      const arr = map[CONFIG.HW_COURSE_MAP[c.id]] || [];
+      box.innerHTML = arr.length
+        ? `<ul class="space-y-1.5">${arr.map(a => {
+            const mm = a.label.split('·'); const wk = (mm[0] || '').trim(); const rng = mm.slice(1).join('·').trim() || a.label;
+            return `<li class="flex gap-2 text-[13px]"><span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 !text-[11px] !py-0 whitespace-nowrap">${U.esc(wk || ('' + a.w) + '주차')}</span><span class="text-on-surface-variant leading-relaxed">${U.esc(rng)}</span></li>`;
+          }).join('')}</ul>`
+        : '<p class="text-on-surface-variant text-[13px] py-1">과제 시스템에 등록된 과제가 없습니다.</p>';
+    }).catch(() => { const box = document.getElementById('hw-assign-list'); if (box) box.innerHTML = '<p class="text-red-400 text-[13px]">과제를 불러오지 못했습니다.</p>'; });
+  }
 }
 
 // ── 강좌 추가/수정 모달 ──
