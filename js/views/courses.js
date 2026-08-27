@@ -123,8 +123,10 @@ function renderDetail(el, courseId) {
       const arr = map[CONFIG.HW_COURSE_MAP[c.id]] || [];
       box.innerHTML = arr.length
         ? `<ul class="space-y-1.5">${arr.map(a => {
-            const mm = a.label.split('·'); const wk = (mm[0] || '').trim(); const rng = mm.slice(1).join('·').trim() || a.label;
-            return `<li class="flex gap-2 text-[13px]"><span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 !text-[11px] !py-0 whitespace-nowrap">${U.esc(wk || ('' + a.w) + '주차')}</span><span class="text-on-surface-variant leading-relaxed">${U.esc(rng)}</span></li>`;
+            const wkM = a.label.match(/^\s*(\d[\d\-]*\s*주차)/);
+            const wk = wkM ? wkM[1].replace(/\s+/g, '') : (a.w + '주차');
+            const rng = a.label.replace(/^\s*\d[\d\-]*\s*주차(에 한 숙제 검사)?\s*[·:\-—]\s*/, '').trim() || a.label;
+            return `<li class="flex gap-2 text-[13px]"><span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 !text-[11px] !py-0 whitespace-nowrap">${U.esc(wk)}</span><span class="text-on-surface-variant leading-relaxed">${U.esc(rng)}</span></li>`;
           }).join('')}</ul>`
         : '<p class="text-on-surface-variant text-[13px] py-1">과제 시스템에 등록된 과제가 없습니다.</p>';
     }).catch(() => { const box = document.getElementById('hw-assign-list'); if (box) box.innerHTML = '<p class="text-red-400 text-[13px]">과제를 불러오지 못했습니다.</p>'; });
