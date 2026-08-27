@@ -79,12 +79,12 @@ function renderDetail(el, courseId) {
             <td class="text-[13px]">${U.esc(s.topic)}</td>
             <td>${s.isVideo ? '<span class="text-on-surface-variant text-[12px]">—</span>' : recs.length ? `<button class="text-secondary text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">${recs.length}명 ✓</button>` : isPast ? `<button class="text-yellow-500 text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">미체크</button>` : '<span class="text-on-surface-variant text-[12px]">예정</span>'}</td>
             <td class="whitespace-nowrap">
-              <button class="${hasMemo ? 'text-secondary' : 'text-on-surface-variant'} hover:text-secondary align-middle" onclick="Views._sessionMemo('${c.id}','${s.id}')" title="${hasMemo ? '회차 메모 보기·추가' : '회차 메모 추가'}"><span class="material-symbols-outlined text-[18px]">sticky_note_2</span></button>
+              <button class="${hasMemo ? 'text-secondary' : 'text-on-surface-variant'} hover:text-secondary align-middle" onclick="Views._sessionMemo('${c.id}','${s.id}')" title="${hasMemo ? '숙제·메모 보기·추가' : '숙제·메모 추가'}"><span class="material-symbols-outlined text-[18px]">assignment</span></button>
               <button class="text-on-surface-variant hover:text-on-surface align-middle ml-1" onclick="Views._sessionForm('${c.id}','${s.id}')" title="회차 수정"><span class="material-symbols-outlined text-[18px]">edit</span></button>
             </td>
           </tr>
           ${hasMemo ? `<tr><td colspan="5" class="!pt-0">
-            <div class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-[12.5px] text-on-surface-variant leading-relaxed whitespace-pre-wrap row-click" onclick="Views._sessionMemo('${c.id}','${s.id}')">${U.esc(s.memo)}</div>
+            <div class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-[12.5px] text-on-surface-variant leading-relaxed whitespace-pre-wrap row-click" onclick="Views._sessionMemo('${c.id}','${s.id}')"><span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 mr-1.5 !text-[10.5px] !py-0 !px-1.5 align-middle">숙제·메모</span>${U.esc(s.memo)}</div>
           </td></tr>` : ''}`;
         }).join('')}</tbody>
       </table></div>
@@ -149,7 +149,7 @@ Views._sessionMemo = function (courseId, sessionId) {
   const c = App.courseOf(courseId);
   const me = localStorage.getItem('hanti-admin-worker') || (App.role === 'master' ? '가경T' : CONFIG.STAFF[1] || '조교');
   App.modal(`
-    <h3 class="font-extrabold text-lg mb-1">회차 메모</h3>
+    <h3 class="font-extrabold text-lg mb-1">이번 회차 숙제 · 메모</h3>
     <p class="text-on-surface-variant text-[13px] mb-4">${U.esc(c ? c.name : '')} · <b>${s.no}회차</b> ${U.fmtD(s.date)}${s.topic ? ' · ' + U.esc(s.topic) : ''}</p>
 
     <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -157,7 +157,7 @@ Views._sessionMemo = function (courseId, sessionId) {
       <select id="sm-who" class="fld !w-auto !py-1 text-[13px]">${CONFIG.STAFF.map(x => `<option ${x === me ? 'selected' : ''}>${x}</option>`).join('')}</select>
       <button class="btn btn-ghost !py-1 !px-2.5 text-[12px]" id="sm-stamp"><span class="material-symbols-outlined text-[15px]">add</span>이름·날짜 줄 추가</button>
     </div>
-    <textarea id="sm-memo" class="fld" rows="9" placeholder="이 회차에 대한 메모를 남기세요. (수업 특이사항, 배부 자료, 다음 주 준비물, 학생 관찰 등)">${U.esc(s.memo || '')}</textarea>
+    <textarea id="sm-memo" class="fld" rows="9" placeholder="이번 주 숙제를 적어 주세요. (예: 교재 p.00~00, 주간지 워크북, 실전 시험 대비)&#10;그 밖의 회차 메모(수업 특이사항·배부 자료·준비물)도 함께 기록할 수 있습니다.">${U.esc(s.memo || '')}</textarea>
     <p class="text-on-surface-variant text-[11.5px] mt-1.5">여러 조교가 함께 씁니다. 지우지 말고 아래에 이어서 적어 주세요.</p>
 
     <div class="flex justify-between gap-2 mt-5">
