@@ -14,9 +14,9 @@ Views.message = function (el) {
       </label>
       ${roster.length ? `<details class="mt-2"><summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer text-[12px] text-secondary select-none">개별 선택 ▾</summary>
         <div class="mt-2 grid sm:grid-cols-2 gap-x-4 gap-y-1 max-h-56 overflow-y-auto pr-1">
-          ${roster.map(s => `<label class="flex items-center gap-2 text-[13px] cursor-pointer py-0.5">
-            <input type="checkbox" class="msg-stu rounded text-secondary focus:ring-secondary" data-sid="${s.id}" data-cid="${c.id}"/>
-            <span class="font-medium">${U.esc(s.name)}</span><span class="text-on-surface-variant text-[11px]">${U.esc(s.school)}</span>
+          ${roster.map(s => `<label class="flex items-center gap-2 text-[13px] cursor-pointer py-0.5 min-w-0">
+            <input type="checkbox" class="msg-stu rounded text-secondary focus:ring-secondary shrink-0" data-sid="${s.id}" data-cid="${c.id}"/>
+            <span class="font-medium shrink-0">${U.esc(s.name)}</span><span class="text-on-surface-variant text-[11px] truncate min-w-0">${U.esc(s.school)}</span>
           </label>`).join('')}
         </div></details>` : '<p class="text-on-surface-variant text-[12px] mt-1">재원생 없음</p>'}
     </div>`;
