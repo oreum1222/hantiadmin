@@ -140,6 +140,7 @@ window.App = {
     { id: 'home', label: '홈', icon: 'space_dashboard' },
     { id: 'courses', label: '강의', icon: 'menu_book' },
     { id: 'students', label: '학생', icon: 'groups' },
+    { id: 'admissions', label: '입시', icon: 'account_balance' },
     { id: 'attendance', label: '출결', icon: 'fact_check' },
     { id: 'makeup', label: '보강', icon: 'event_repeat' },
     { id: 'notices', label: '공지', icon: 'campaign' },

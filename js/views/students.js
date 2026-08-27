@@ -150,6 +150,8 @@ function renderStudent(el, studentId) {
 
     ${Views._reviewHTML(s)}
 
+    ${Views._admissionHTML(s)}
+
     ${s.consult ? `
     <section class="card p-5 lg:col-span-2">
       <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">forum</span>첫수업 대면 상담 <span class="text-on-surface-variant font-normal text-[13px]">(7/12 상담지)</span></h2>
@@ -212,6 +214,77 @@ Views._reviewHTML = function (s) {
       ${(!isWork && rv.take) ? `<div class="text-[13px] mb-1"><span class="text-on-surface-variant">응시</span> <b>${U.esc(rv.take)}</b></div>` : ''}
       ${rv.weak ? `<div class="text-[13px] mb-1"><span class="text-on-surface-variant">취약 · 특이</span> ${U.esc(rv.weak)}</div>` : ''}
       ${(rv.hw && rv.hw.length) ? `<div class="mt-2.5"><div class="text-[13px] font-bold mb-1">숙제 검사</div><ul class="text-[13px] text-on-surface-variant space-y-1">${rv.hw.map(h => `<li>– ${U.esc(h)}</li>`).join('')}</ul></div>` : ''}
+    </section>`;
+};
+
+// ── 입시 조사 섹션 (고3 수능 정규반) ──
+Views._admChip = function (list) {
+  return (list || []).map(t => {
+    const cls = t.includes('논술') ? 'text-secondary border-secondary/30 bg-secondary-fixed/50'
+      : t.includes('학종') ? 'text-sky-400 border-sky-400/30 bg-sky-400/10'
+        : t.includes('교과') ? 'text-amber-500 border-amber-500/30 bg-amber-500/10'
+          : 'text-on-surface-variant border-outline-variant';
+    return `<span class="chip border ${cls}">${U.esc(t)}</span>`;
+  }).join('');
+};
+Views._admissionHTML = function (s) {
+  const a = (window.ADMISSIONS || {})[s.id];
+  if (!a) return '';
+  const F = (label, val) => `<div><div class="text-[11px] text-on-surface-variant mb-0.5">${label}</div><div class="text-[13.5px] font-semibold">${U.esc(val || '—')}</div></div>`;
+  const wonseo = [['논술', a.non], ['학종', a.hak], ['교과', a.gyo]].filter(x => x[1]).map(x => `${x[0]} ${x[1]}장`).join(' · ');
+  const w = parseInt(a.weight, 10);
+  const changed = a.change && a.change !== '그대로';
+  return `
+    <section class="card p-5 lg:col-span-2">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-secondary text-[20px]">account_balance</span>
+        <h2 class="font-bold text-[16px]">입시 조사</h2>
+        <span class="chip border text-on-surface-variant border-outline-variant">${a.course === 'F' ? '금요 정규반' : '토요 정규반'}</span>
+        <span class="text-on-surface-variant font-normal text-[12px]">2026-08 조사</span>
+        <button class="btn btn-ghost !py-1 !px-2.5 text-[12px] ml-auto" onclick="App.navigate('admissions')"><span class="material-symbols-outlined text-[16px]">bar_chart</span>전체 대시보드</button>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        ${F('선택 과목', a.subject + (changed ? '' : ''))}
+        ${F('9평 목표 등급', a.grade + '등급')}
+        <div><div class="text-[11px] text-on-surface-variant mb-0.5">수시 전형</div><div class="flex flex-wrap gap-1">${Views._admChip(a.susi) || '<span class="text-[13.5px] font-semibold">—</span>'}</div></div>
+        <div><div class="text-[11px] text-on-surface-variant mb-0.5">정시 비중 <span class="opacity-70">(수시↔정시)</span></div>
+          <div class="flex items-center gap-2">
+            <div class="flex-1 h-2 rounded-full bg-surface-container-low overflow-hidden"><div class="h-full rounded-full bg-secondary" style="width:${isNaN(w) ? 0 : w * 10}%"></div></div>
+            <span class="text-[13px] font-bold shrink-0">${isNaN(w) ? '—' : w + '/10'}</span>
+          </div>
+        </div>
+      </div>
+
+      ${wonseo ? `<div class="text-[13px] mb-3"><span class="text-on-surface-variant">원서 계획</span> <b>${U.esc(wonseo)}</b></div>` : ''}
+      ${changed ? `<div class="text-[13px] mb-3"><span class="chip border text-amber-500 border-amber-500/30 bg-amber-500/10">과목 변경 고려</span> <span class="text-on-surface-variant">${U.esc(a.change)}</span></div>` : ''}
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <div class="bg-surface-container-low border border-outline-variant rounded-lg p-3.5">
+          <div class="text-[12px] font-bold text-secondary mb-2">지원 라인 · 현재 성적 기준</div>
+          <div class="space-y-1.5 text-[13px]">
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">최고</span><b>${U.esc(a.top || '—')}</b></div>
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">안정권</span><b>${U.esc(a.safe || '—')}</b></div>
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">최저</span><b>${U.esc(a.bot || '—')}</b></div>
+          </div>
+        </div>
+        <div class="bg-surface-container-low border border-outline-variant rounded-lg p-3.5">
+          <div class="text-[12px] font-bold text-on-surface-variant mb-2">지원 라인 · 6월 모평 기준</div>
+          <div class="space-y-1.5 text-[13px]">
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">최고</span>${U.esc(a.s6top || '—')}</div>
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">안정권</span>${U.esc(a.s6safe || '—')}</div>
+            <div class="flex gap-2"><span class="text-on-surface-variant w-14 shrink-0">최저</span>${U.esc(a.s6bot || '—')}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 items-center text-[13px]">
+        ${a.paid === '네' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">유료 컨설팅 관심</span>' : ''}
+        ${a.intro === '네' ? '<span class="chip border text-sky-400 border-sky-400/30 bg-sky-400/10">학원 컨설턴트 소개 희망</span>' : ''}
+        ${a.schoolConsult === '네'
+      ? '<span class="chip border text-on-surface-variant border-outline-variant">학교 수시상담 진행</span>'
+      : `<span class="chip border text-amber-500 border-amber-500/30 bg-amber-500/10">학교 수시상담 미진행</span>${a.reason ? ` <span class="text-on-surface-variant">${U.esc(a.reason)}</span>` : ''}`}
+      </div>
     </section>`;
 };
 
