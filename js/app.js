@@ -33,6 +33,14 @@ window.App = {
   },
   coursesOf(studentId) { return App.db.enrollments.filter(e => e.studentId === studentId).map(e => App.courseOf(e.courseId)).filter(Boolean); },
   attOf(sessionId) { return App.db.attendance.filter(a => a.sessionId === sessionId); },
+  // 후발 등록 학생의 수강 시작일 (이 날짜 이전 회차는 '수강 전')
+  enrollStart(studentId) { return (window.ENROLL_START || {})[studentId] || ''; },
+  // 학생의 수강 시작 회차 번호(해당 강좌에서 시작일 이후 첫 비영상 회차)
+  startSessionNo(courseId, studentId) {
+    const st = App.enrollStart(studentId); if (!st) return null;
+    const first = App.sessionsOf(courseId).filter(s => !s.isVideo).find(s => (s.date || '') >= st);
+    return first ? first.no : null;
+  },
 
   // 강좌 출석률 (기록이 있는 회차 기준, 출석+지각+온라인 = 출석 인정)
   attRate(courseId) {

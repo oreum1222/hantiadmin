@@ -19,9 +19,11 @@ Views.attendance = function (el) {
   const existing = {};
   if (session) App.attOf(session.id).forEach(a => existing[a.studentId] = a);
 
-  // 편집 버퍼 (저장 전 로컬 상태)
+  // 후발 등록: 이 회차 날짜가 학생의 수강 시작일보다 앞이면 '수강 전'
+  const isNotYet = st => { const s0 = App.enrollStart(st.id); return !!(session && s0 && (session.date || '') < s0); };
+  // 편집 버퍼 (저장 전 로컬 상태) — 수강 전 학생은 제외
   const buf = {};
-  roster.forEach(st => { buf[st.id] = { status: existing[st.id]?.status || '', memo: existing[st.id]?.memo || '' }; });
+  roster.forEach(st => { if (isNotYet(st)) return; buf[st.id] = { status: existing[st.id]?.status || '', memo: existing[st.id]?.memo || '' }; });
 
   el.innerHTML = `
   <div class="mb-6">
@@ -61,17 +63,20 @@ Views.attendance = function (el) {
       </div>
     </div>
     <div id="at-rows">
-      ${roster.map(st => `
-      <div class="px-5 py-3.5 border-b border-outline-variant last:border-0 grid md:grid-cols-[minmax(130px,1fr)_minmax(280px,2fr)_minmax(140px,1fr)] gap-3 items-center" data-sid="${st.id}">
+      ${roster.map(st => {
+        const nY = isNotYet(st);
+        return `<div class="px-5 py-3.5 border-b border-outline-variant last:border-0 grid md:grid-cols-[minmax(130px,1fr)_minmax(280px,2fr)_minmax(140px,1fr)] gap-3 items-center ${nY ? 'opacity-60' : ''}" data-sid="${st.id}">
         <div>
           <div class="font-bold text-[14px]">${U.esc(st.name)}</div>
           <div class="text-on-surface-variant text-[12px]">${U.esc(st.school)} ${U.esc(st.grade)}</div>
         </div>
-        <div class="flex gap-1.5">
+        ${nY
+          ? `<div class="md:col-span-2 text-[13px] text-on-surface-variant flex items-center gap-1.5"><span class="material-symbols-outlined text-[17px]">schedule</span><b>${App.startSessionNo(courseId, st.id) || ''}회차부터 수강</b> <span class="text-[12px]">· 이 회차는 수강 전</span></div>`
+          : `<div class="flex gap-1.5">
           ${CONFIG.ATT_STATUSES.map(s => `<button class="att-btn" data-status="${s}">${s}</button>`).join('')}
         </div>
-        <input class="fld !py-1.5 text-[13px] at-memo" placeholder="메모" value="${U.esc(buf[st.id].memo)}"/>
-      </div>`).join('')}
+        <input class="fld !py-1.5 text-[13px] at-memo" placeholder="메모" value="${U.esc(buf[st.id].memo)}"/>`}
+      </div>`; }).join('')}
     </div>
     <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-between gap-3 bg-surface-container-low/50">
       <div id="at-summary" class="text-[13px] text-on-surface-variant"></div>
@@ -88,6 +93,7 @@ Views.attendance = function (el) {
   // ── 상태 버튼 로직 ──
   function paintRow(row) {
     const sid = row.dataset.sid;
+    if (!buf[sid]) return; // 수강 전 학생 행은 스킵
     row.querySelectorAll('.att-btn').forEach(b => {
       const on = buf[sid].status === b.dataset.status;
       b.className = 'att-btn' + (on ? ' on-' + b.dataset.status : '');
@@ -103,11 +109,13 @@ Views.attendance = function (el) {
   }
   document.querySelectorAll('#at-rows [data-sid]').forEach(row => {
     const sid = row.dataset.sid;
+    if (!buf[sid]) return; // 수강 전 학생 행은 이벤트 없음
     row.querySelectorAll('.att-btn').forEach(b => b.addEventListener('click', () => {
       buf[sid].status = (buf[sid].status === b.dataset.status) ? '' : b.dataset.status; // 재탭 = 해제
       paintRow(row); paintSummary();
     }));
-    row.querySelector('.at-memo').addEventListener('input', e => { buf[sid].memo = e.target.value; });
+    const memoEl = row.querySelector('.at-memo');
+    if (memoEl) memoEl.addEventListener('input', e => { buf[sid].memo = e.target.value; });
     paintRow(row);
   });
   paintSummary();
