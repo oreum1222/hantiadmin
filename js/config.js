@@ -44,6 +44,7 @@ window.CONFIG = {
     h1: 'hanti-dan-h1-gojeon', h2: 'hanti-dan-h2-hwaeon',
     sh1: 'hanti-jong-h1-gojeonbeop', sm3: 'hanti-jong-m3-hyeonbeop',
     g3f: 'go3-regular', g3s: 'go3-regular',
+    g2cs: 'hanti-dan-h2-suneung',
   },
   // 백엔드 senderFor_가 courseId 'hanti-' 접두로 한티 9279-9349 라우팅함(이미 반영됨). false면 한티 실발송 차단.
   SEND_SENDER_ROUTING: true,
