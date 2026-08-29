@@ -146,7 +146,7 @@ window.App = {
     { id: 'notices', label: '공지', icon: 'campaign' },
     { id: 'message', label: '문자 발송', icon: 'sms' },
     { id: 'tasks', label: '조교 확인', icon: 'checklist' },
-    { id: 'diagnosis', label: '성향 진단', icon: 'psychology', url: 'https://oreum1222.github.io/oreum-fassessment/dashboard.html' },
+    { id: 'diagnosis', label: '성향 진단', icon: 'psychology' },
     { id: 'review', label: '복습시험', icon: 'quiz', url: 'https://oreum1222.github.io/oreum-study/dashboard.html' },
   ],
   navigate(view) { location.hash = '#' + view; },
