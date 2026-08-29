@@ -45,9 +45,9 @@ Views.diagnosis = function (el) {
       return { lab, key, avg: vals.length ? Math.round(vals.reduce((s, n) => s + n, 0) / vals.length) : null };
     });
 
-    // 주의 학생: 재원생 첫에서 40 미만 축이 3개 이상 (관리 우선순위)
+    // 주의 학생: 재원생 첫에서 40 미만 축이 4개 이상 (6축 중 다수가 저조 — 관리 우선순위)
     const lowOf = x => AX.map(([, k]) => x.r.first[k]).filter(v => typeof v === 'number' && v < 40).length;
-    const alert = withFirst.filter(x => lowOf(x) >= 3)
+    const alert = withFirst.filter(x => lowOf(x) >= 4)
       .map(x => ({ x, low: lowOf(x), min: Math.min(...AX.map(([, k]) => x.r.first[k]).filter(v => typeof v === 'number')) }))
       .sort((a, b) => b.low - a.low || a.min - b.min);
     const noResp = studs.filter(x => !x.r.first && !x.r.summer).map(x => x.s)
@@ -59,7 +59,7 @@ Views.diagnosis = function (el) {
       ${statCard('how_to_reg', '재원생 첫 진단', rate + '%', `${nFirst} / 재원 ${total}명`)}
       ${statCard('family_restroom', '학부모 관찰', nParent + '명', '가정 관찰 응답')}
       ${statCard('wb_sunny', '여름방학 진단', nSummer + '명', '여름 학습 점검')}
-      ${statCard('warning', '주의 관찰 대상', alert.length + '명', '저조 축 3개 이상')}
+      ${statCard('warning', '주의 관찰 대상', alert.length + '명', '6축 중 4개 이상 저조')}
     </div>
 
     <div class="grid lg:grid-cols-2 gap-4 mb-4">
@@ -78,7 +78,7 @@ Views.diagnosis = function (el) {
 
     <section class="card p-5 mb-4">
       <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">priority_high</span>주의 관찰 대상 <span class="text-on-surface-variant font-normal text-[13px]">${alert.length}명</span></h2>
-      ${alert.length ? `<div class="flex flex-wrap gap-1.5">${alert.map(a => `<button class="chip border text-red-400 border-red-400/30 bg-red-400/10 hover:opacity-80" onclick="location.hash='#students/${a.x.s.id}'">${U.esc(a.x.s.name)} · 저조 ${a.low}축</button>`).join(' ')}</div>` : '<p class="text-on-surface-variant text-[13px] py-1">저조 축 2개 이상인 학생이 없습니다. 👍</p>'}
+      ${alert.length ? `<div class="flex flex-wrap gap-1.5">${alert.map(a => `<button class="chip border text-red-400 border-red-400/30 bg-red-400/10 hover:opacity-80" onclick="location.hash='#students/${a.x.s.id}'">${U.esc(a.x.s.name)} · 저조 ${a.low}축</button>`).join(' ')}</div>` : '<p class="text-on-surface-variant text-[13px] py-1">해당 학생이 없습니다. 👍</p>'}
     </section>
 
     <section class="card overflow-hidden mb-4">
