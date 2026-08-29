@@ -83,25 +83,52 @@ window.App = {
   smsBytes(text) { let b = 0; for (const ch of String(text || '')) b += ch.charCodeAt(0) > 127 ? 2 : 1; return b; },
 
   // ── 과제(숙제) 라이브 연동: 과제 검사 시스템에서 주차별 과제 범위 조회(세션당 1회 캐시) ──
+  // 과제 검사 시스템 강좌 레지스트리(정의)를 가볍게 로드 — 6MB list 대신 courses.js(≈10KB)
+  hwCourseList() {
+    if (!window.__HW_COURSES) {
+      window.__HW_COURSES = new Promise(resolve => {
+        if (Array.isArray(window.COURSE_LIST)) return resolve(window.COURSE_LIST);
+        const s = document.createElement('script');
+        s.src = (CONFIG.HOMEWORK_SITE || 'https://oreum1222.github.io/homework/') + 'data/courses.js?cb=' + Date.now();
+        s.onload = () => resolve(window.COURSE_LIST || []);
+        s.onerror = () => resolve([]);
+        document.head.appendChild(s);
+      });
+    }
+    return window.__HW_COURSES;
+  },
+  // hwsysCourseId -> [{ w, label, area, date, month, status }]  (courses.js 기반)
   hwAssignments() {
     if (!window.__HW_ASSIGN) {
-      window.__HW_ASSIGN = fetch(CONFIG.SEND_URL + '?action=list')
-        .then(r => r.json())
-        .then(list => {
-          const map = {}; // hwsysCourseId -> { week -> {label, area} }
-          (list || []).forEach(r => {
-            const cid = r.courseId, w = r.week, wl = r.weekLabel;
-            if (!cid || w == null || w === '' || !wl) return;
-            (map[cid] = map[cid] || {})[w] = { label: String(wl), area: r.area || '' };
-          });
-          const out = {};
-          Object.keys(map).forEach(cid => {
-            out[cid] = Object.keys(map[cid]).map(Number).sort((a, b) => a - b).map(w => ({ w, ...map[cid][w] }));
-          });
-          return out;
-        }).catch(() => ({}));
+      window.__HW_ASSIGN = App.hwCourseList().then(list => {
+        const out = {};
+        (list || []).forEach(c => {
+          const weeks = [];
+          if (Array.isArray(c.weeks)) weeks.push(...c.weeks.map(w => ({ ...w })));
+          if (Array.isArray(c.months)) c.months.forEach(m => (m.weeks || []).forEach(w => weeks.push({ ...w, month: m.month })));
+          out[c.id] = weeks.map(w => ({ w: w.week, label: String(w.label || ''), area: w.area || '', date: w.date || '', month: w.month || '', status: w.status || '' }))
+            .sort((a, b) => (a.month || '').localeCompare(b.month || '') || (a.w - b.w));
+        });
+        return out;
+      }).catch(() => ({}));
     }
     return window.__HW_ASSIGN;
+  },
+  // 과제 검사 시스템 등록 명단 (courseId 기준, 헤더행 제외) — 54KB
+  hwRoster() {
+    if (!window.__HW_ROSTER) {
+      window.__HW_ROSTER = fetch(CONFIG.SEND_URL + '?action=roster').then(r => r.json())
+        .then(rows => (rows || []).filter(x => x.courseId && x.courseId !== 'courseId')).catch(() => []);
+    }
+    return window.__HW_ROSTER;
+  },
+  // 미완료(독려 대상) 큐 — 28KB
+  hwPending() {
+    if (!window.__HW_PENDING) {
+      window.__HW_PENDING = fetch(CONFIG.SEND_URL + '?action=pending').then(r => r.json())
+        .then(rows => Array.isArray(rows) ? rows.filter(x => x && x.name && x.name !== '실험용' && x.name !== '[실험용]') : []).catch(() => []);
+    }
+    return window.__HW_PENDING;
   },
 
   // ── 액션 실행 (저장 중 토스트 → 성공/실패) ──
@@ -147,6 +174,7 @@ window.App = {
     { id: 'message', label: '문자 발송', icon: 'sms' },
     { id: 'tasks', label: '조교 확인', icon: 'checklist' },
     { id: 'diagnosis', label: '성향 진단', icon: 'psychology' },
+    { id: 'homework', label: '과제', icon: 'assignment_turned_in' },
     { id: 'review', label: '복습시험', icon: 'quiz', url: 'https://oreum1222.github.io/oreum-study/dashboard.html' },
   ],
   navigate(view) { location.hash = '#' + view; },
