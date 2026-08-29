@@ -45,9 +45,9 @@ Views.diagnosis = function (el) {
       return { lab, key, avg: vals.length ? Math.round(vals.reduce((s, n) => s + n, 0) / vals.length) : null };
     });
 
-    // 주의 학생: 재원생 첫에서 40 미만 축이 2개 이상
+    // 주의 학생: 재원생 첫에서 40 미만 축이 3개 이상 (관리 우선순위)
     const lowOf = x => AX.map(([, k]) => x.r.first[k]).filter(v => typeof v === 'number' && v < 40).length;
-    const alert = withFirst.filter(x => lowOf(x) >= 2)
+    const alert = withFirst.filter(x => lowOf(x) >= 3)
       .map(x => ({ x, low: lowOf(x), min: Math.min(...AX.map(([, k]) => x.r.first[k]).filter(v => typeof v === 'number')) }))
       .sort((a, b) => b.low - a.low || a.min - b.min);
     const noResp = studs.filter(x => !x.r.first && !x.r.summer).map(x => x.s)
@@ -59,7 +59,7 @@ Views.diagnosis = function (el) {
       ${statCard('how_to_reg', '재원생 첫 진단', rate + '%', `${nFirst} / 재원 ${total}명`)}
       ${statCard('family_restroom', '학부모 관찰', nParent + '명', '가정 관찰 응답')}
       ${statCard('wb_sunny', '여름방학 진단', nSummer + '명', '여름 학습 점검')}
-      ${statCard('warning', '주의 관찰 대상', alert.length + '명', '저조 축 2개 이상')}
+      ${statCard('warning', '주의 관찰 대상', alert.length + '명', '저조 축 3개 이상')}
     </div>
 
     <div class="grid lg:grid-cols-2 gap-4 mb-4">
