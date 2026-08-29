@@ -37,7 +37,7 @@ window.CONFIG = {
   // 발신번호 라우팅: MEXX 강좌는 한티 번호, 그 외(고3 오름 정규)는 오름 번호
   SENDER_HANTI: '010-9279-9349',
   SENDER_OREUM: '010-2452-7452',
-  MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3', 'g2cs'],
+  MEXX_COURSES: ['h1', 'h2', 'sh1', 'sm3', 'g2cs', 'g2he'],
 
   // 과제(숙제) 자동 연동: 대시보드 강좌 → 과제 검사 시스템(hwsys) courseId. 주차별 과제 범위를 라이브로 표시.
   HW_COURSE_MAP: {
