@@ -154,7 +154,7 @@ function renderStudent(el, studentId) {
 
     ${s.consult ? `
     <section class="card p-5 lg:col-span-2">
-      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">forum</span>첫수업 대면 상담 <span class="text-on-surface-variant font-normal text-[13px]">(7/12 상담지)</span></h2>
+      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">forum</span>대면 상담</h2>
       <p class="text-on-surface-variant text-[13px] leading-relaxed whitespace-pre-wrap">${U.esc(s.consult)}</p>
     </section>` : ''}
 
