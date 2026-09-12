@@ -32,7 +32,13 @@ Views.tasks = function (el) {
       { id: 'mat-su-3', label: '교재 및 워크북 해설지' },
     ] },
   ];
-  function weekKey() { const d = new Date(); const s = new Date(d); s.setDate(d.getDate() - d.getDay()); return s.toISOString().slice(0, 10); }
+  // 주(週) 식별: 가장 최근 지나간 '일요일 22:00'을 앵커로 (자료·정기 루틴 공통 기준)
+  function weekKey() {
+    const now = new Date();
+    const a = new Date(now); a.setHours(22, 0, 0, 0); a.setDate(a.getDate() - a.getDay()); // 이번 주 일요일 22:00
+    if (a > now) a.setDate(a.getDate() - 7); // 아직 도래 전이면 지난 일요일 22:00
+    return a.getFullYear() + '-' + String(a.getMonth() + 1).padStart(2, '0') + '-' + String(a.getDate()).padStart(2, '0');
+  }
   // 정기 루틴 체크: 조교 공용(서버 저장, 숨김 시스템 레코드). 주가 바뀌면 자동 리셋.
   const RT_ID = 'sys-routine';
   function loadRoutine() {
@@ -137,7 +143,7 @@ Views.tasks = function (el) {
           </div>
         </div>`; }).join('')}
       </div>
-      <p class="text-on-surface-variant text-[11px] mt-3">체크는 <b>모든 조교가 공유</b>합니다(서버 저장). 매주(일요일 기준) 자동으로 새로 시작됩니다.</p>
+      <p class="text-on-surface-variant text-[11px] mt-3">체크는 <b>모든 조교가 공유</b>합니다(서버 저장). 매주 <b>일요일 22시</b>에 자동으로 새로 시작됩니다.</p>
     </section>`;
     document.querySelectorAll('.rt-chk').forEach(c => c.addEventListener('change', async () => {
       const state = loadRoutine(); const me = document.getElementById('tk-worker').value;
@@ -153,13 +159,7 @@ Views.tasks = function (el) {
   // ── 자료 준비 체크리스트 (공용 저장 · 매주 일요일 22시 리셋) ──
   // 모든 조교가 함께 보도록 서버(시트)에 숨김 레코드로 저장. 주가 바뀌면 자동으로 빈 상태로 리셋.
   const MAT_ID = 'sys-matcheck';
-  // 가장 최근 지나간 '일요일 22:00'을 기준 앵커로 삼아 주(週)를 식별
-  function matWeekKey() {
-    const now = new Date();
-    const a = new Date(now); a.setHours(22, 0, 0, 0); a.setDate(a.getDate() - a.getDay()); // 이번 주 일요일 22:00
-    if (a > now) a.setDate(a.getDate() - 7); // 아직 도래 전이면 지난 일요일 22:00
-    return a.getFullYear() + '-' + String(a.getMonth() + 1).padStart(2, '0') + '-' + String(a.getDate()).padStart(2, '0');
-  }
+  const matWeekKey = weekKey; // 자료 체크리스트도 동일 기준(일요일 22:00)
   function loadMat() {
     const rec = (App.db.tasks || []).find(t => t.id === MAT_ID);
     let st = {}; if (rec && rec.detail) { try { st = JSON.parse(rec.detail) || {}; } catch (e) { st = {}; } }
