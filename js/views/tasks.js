@@ -139,9 +139,27 @@ Views.tasks = function (el) {
   }
   drawRoutine();
 
-  // ── 자료 준비 체크리스트 렌더 (매주 리셋, 2행 3열 가로 배치) ──
+  // ── 자료 준비 체크리스트 (공용 저장 · 매주 일요일 22시 리셋) ──
+  // 모든 조교가 함께 보도록 서버(시트)에 숨김 레코드로 저장. 주가 바뀌면 자동으로 빈 상태로 리셋.
+  const MAT_ID = 'sys-matcheck';
+  // 가장 최근 지나간 '일요일 22:00'을 기준 앵커로 삼아 주(週)를 식별
+  function matWeekKey() {
+    const now = new Date();
+    const a = new Date(now); a.setHours(22, 0, 0, 0); a.setDate(a.getDate() - a.getDay()); // 이번 주 일요일 22:00
+    if (a > now) a.setDate(a.getDate() - 7); // 아직 도래 전이면 지난 일요일 22:00
+    return a.getFullYear() + '-' + String(a.getMonth() + 1).padStart(2, '0') + '-' + String(a.getDate()).padStart(2, '0');
+  }
+  function loadMat() {
+    const rec = (App.db.tasks || []).find(t => t.id === MAT_ID);
+    let st = {}; if (rec && rec.detail) { try { st = JSON.parse(rec.detail) || {}; } catch (e) { st = {}; } }
+    const wk = matWeekKey();
+    return (st.week === wk) ? { week: wk, checks: st.checks || {} } : { week: wk, checks: {} }; // 주 바뀌면 리셋
+  }
+  async function saveMat(state) {
+    return App.act('upsertTask', { id: MAT_ID, title: '[시스템] 자료 준비 체크', status: '완료', assignee: '', detail: JSON.stringify(state) });
+  }
   function drawMaterials() {
-    const chk = loadChk();
+    const chk = loadMat().checks;
     const allIds = MATERIALS.flatMap(g => g.items.map(it => it.id));
     const done = allIds.filter(id => chk[id]).length, total = allIds.length;
     const cell = it => { const c = chk[it.id]; return `
@@ -155,7 +173,7 @@ Views.tasks = function (el) {
     document.getElementById('mat-board').innerHTML = `
     <section class="card p-5 mb-6">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">inventory</span>자료 준비 체크리스트 <span class="text-on-surface-variant font-normal text-[13px]">매주 나가는 자료 점검</span></h2>
+        <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">inventory</span>자료 준비 체크리스트 <span class="text-on-surface-variant font-normal text-[13px]">매주 나가는 자료 점검 · 조교 공용</span></h2>
         <span class="chip border ${done === total ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-on-surface-variant border-outline-variant'}">${done}/${total} 완료</span>
       </div>
       <div class="h-1.5 rounded-full bg-surface-container-low overflow-hidden mb-4"><div class="h-full rounded-full bg-secondary transition-all" style="width:${done / total * 100}%"></div></div>
@@ -165,12 +183,15 @@ Views.tasks = function (el) {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">${g.items.map(cell).join('')}</div>
         </div>`; }).join('')}
       </div>
-      <p class="text-on-surface-variant text-[11px] mt-3">체크는 이 기기에 저장되며 매주(일요일 기준) 자동으로 새로 시작됩니다.</p>
+      <p class="text-on-surface-variant text-[11px] mt-3">체크는 <b>모든 조교가 공유</b>합니다(서버 저장). 매주 <b>일요일 22시</b>에 자동으로 새로 시작됩니다.</p>
     </section>`;
-    document.querySelectorAll('.mat-chk').forEach(c => c.addEventListener('change', () => {
-      const o = loadChk(); const me = document.getElementById('tk-worker').value;
-      if (c.checked) o[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete o[c.dataset.id];
-      saveChk(o); drawMaterials();
+    document.querySelectorAll('.mat-chk').forEach(c => c.addEventListener('change', async () => {
+      const state = loadMat(); const me = document.getElementById('tk-worker').value;
+      if (c.checked) state.checks[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete state.checks[c.dataset.id];
+      c.disabled = true;
+      const ok = await saveMat(state);
+      c.disabled = false;
+      if (ok) drawMaterials(); else c.checked = !c.checked;
     }));
   }
   drawMaterials();
@@ -186,7 +207,7 @@ Views.tasks = function (el) {
   function draw() {
     const fa = document.getElementById('tk-assignee').value;
     const showDone = document.getElementById('tk-showdone').checked;
-    let list = [...(App.db.tasks || [])];
+    let list = [...(App.db.tasks || [])].filter(t => !String(t.id).startsWith('sys-')); // 숨김 시스템 레코드 제외
     if (fa) list = list.filter(t => (t.assignee || '') === fa);
     const pend = list.filter(t => t.status !== '완료').sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'));
     const done = list.filter(t => t.status === '완료').sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || ''));
