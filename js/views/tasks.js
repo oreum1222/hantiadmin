@@ -33,9 +33,17 @@ Views.tasks = function (el) {
     ] },
   ];
   function weekKey() { const d = new Date(); const s = new Date(d); s.setDate(d.getDate() - d.getDay()); return s.toISOString().slice(0, 10); }
-  const WK = 'hanti-routine-' + weekKey();
-  const loadChk = () => { try { return JSON.parse(localStorage.getItem(WK) || '{}'); } catch (e) { return {}; } };
-  const saveChk = o => { try { localStorage.setItem(WK, JSON.stringify(o)); } catch (e) { } };
+  // 정기 루틴 체크: 조교 공용(서버 저장, 숨김 시스템 레코드). 주가 바뀌면 자동 리셋.
+  const RT_ID = 'sys-routine';
+  function loadRoutine() {
+    const rec = (App.db.tasks || []).find(t => t.id === RT_ID);
+    let st = {}; if (rec && rec.detail) { try { st = JSON.parse(rec.detail) || {}; } catch (e) { st = {}; } }
+    const wk = weekKey();
+    return (st.week === wk) ? { week: wk, checks: st.checks || {} } : { week: wk, checks: {} };
+  }
+  async function saveRoutine(state) {
+    return App.act('upsertTask', { id: RT_ID, title: '[시스템] 정기 루틴 체크', status: '완료', assignee: '', detail: JSON.stringify(state) });
+  }
 
   el.innerHTML = `
   <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
@@ -82,7 +90,7 @@ Views.tasks = function (el) {
 
   // ── 정기 루틴 렌더 ──
   function drawRoutine() {
-    const chk = loadChk();
+    const chk = loadRoutine().checks;
     const leafIds = r => r.subs ? r.subs.map((_, i) => r.id + '-' + i) : [r.id];
     const allLeaves = ROUTINE.flatMap(leafIds);
     const doneN = ids => ids.filter(id => chk[id]).length;
@@ -129,12 +137,15 @@ Views.tasks = function (el) {
           </div>
         </div>`; }).join('')}
       </div>
-      <p class="text-on-surface-variant text-[11px] mt-3">체크는 이 기기에 저장되며 매주(일요일 기준) 자동으로 새로 시작됩니다. 조교 공용 공유 체크가 필요하면 알려주세요.</p>
+      <p class="text-on-surface-variant text-[11px] mt-3">체크는 <b>모든 조교가 공유</b>합니다(서버 저장). 매주(일요일 기준) 자동으로 새로 시작됩니다.</p>
     </section>`;
-    document.querySelectorAll('.rt-chk').forEach(c => c.addEventListener('change', () => {
-      const o = loadChk(); const me = document.getElementById('tk-worker').value;
-      if (c.checked) o[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete o[c.dataset.id];
-      saveChk(o); drawRoutine();
+    document.querySelectorAll('.rt-chk').forEach(c => c.addEventListener('change', async () => {
+      const state = loadRoutine(); const me = document.getElementById('tk-worker').value;
+      if (c.checked) state.checks[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete state.checks[c.dataset.id];
+      c.disabled = true;
+      const ok = await saveRoutine(state);
+      c.disabled = false;
+      if (ok) drawRoutine(); else c.checked = !c.checked;
     }));
   }
   drawRoutine();
