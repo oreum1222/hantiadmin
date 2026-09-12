@@ -178,13 +178,25 @@ window.Api = (function () {
       return j.ok ? { role: j.role } : null;
     },
 
-    // 전체 데이터 로드
+    // 전체 데이터 로드 — GAS가 큰 응답에서 간헐적으로 HTML 인터스티셜을 반환하므로 재시도
     async load(pin) {
       if (isDemo()) return demoLoad();
-      const res = await fetch(CONFIG.SCRIPT_URL + '?pin=' + encodeURIComponent(pin));
-      const j = await res.json();
-      if (!j.ok) throw new Error(j.error || '데이터를 불러오지 못했습니다.');
-      return j.db;
+      let lastErr;
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          const res = await fetch(CONFIG.SCRIPT_URL + '?pin=' + encodeURIComponent(pin) + '&t=' + Date.now(), { cache: 'no-store' });
+          const txt = await res.text();
+          let j;
+          try { j = JSON.parse(txt); }
+          catch (e) { lastErr = new Error('서버 응답 오류(재시도 중)'); await new Promise(r => setTimeout(r, 400 * (attempt + 1))); continue; }
+          if (!j.ok) throw new Error(j.error || '데이터를 불러오지 못했습니다.');
+          return j.db;
+        } catch (e) {
+          lastErr = e;
+          if (attempt < 3) await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+        }
+      }
+      throw lastErr || new Error('데이터를 불러오지 못했습니다.');
     },
 
     // 액션 실행 → 변경된 DB를 로컬 상태에도 반영
