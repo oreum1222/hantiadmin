@@ -18,6 +18,20 @@ Views.tasks = function (el) {
     { id: 'pm-attend', phase: '수업 후', when: '일 15:55', cls: '수능 국어반', staff: '규민·경은·채현·재희', task: '출석부 특이사항 점검 · 출석부 사진 단톡 공유' },
   ];
   const PHASES = [['수업 전', 'inventory_2'], ['수업 중', 'edit_note'], ['수업 후', 'fact_check']];
+
+  // ── 매주 나가는 자료 준비 점검 (가경T·조교 공용) ──
+  const MATERIALS = [
+    { group: '화법과 언어', icon: 'record_voice_over', items: [
+      { id: 'mat-hy-1', label: '내신형 문항 모음 워크북' },
+      { id: 'mat-hy-2', label: '전주차 해설지 자료' },
+      { id: 'mat-hy-3', label: '전주차 오답률 자료' },
+    ] },
+    { group: '수능 국어', icon: 'menu_book', items: [
+      { id: 'mat-su-1', label: '교재' },
+      { id: 'mat-su-2', label: '워크북' },
+      { id: 'mat-su-3', label: '교재 및 워크북 해설지' },
+    ] },
+  ];
   function weekKey() { const d = new Date(); const s = new Date(d); s.setDate(d.getDate() - d.getDay()); return s.toISOString().slice(0, 10); }
   const WK = 'hanti-routine-' + weekKey();
   const loadChk = () => { try { return JSON.parse(localStorage.getItem(WK) || '{}'); } catch (e) { return {}; } };
@@ -46,6 +60,8 @@ Views.tasks = function (el) {
       <li><b class="text-amber-500">4)</b> 관리자 대시보드 <b>문자 발송 탭</b>에서 학생 및 학부모님 신규 문자 발송 <span class="text-on-surface-variant">(템플릿 저장돼 있음)</span></li>
     </ol>
   </section>
+
+  <div id="mat-board"></div>
 
   <div id="routine-board"></div>
 
@@ -122,6 +138,42 @@ Views.tasks = function (el) {
     }));
   }
   drawRoutine();
+
+  // ── 자료 준비 체크리스트 렌더 (매주 리셋, 2행 3열 가로 배치) ──
+  function drawMaterials() {
+    const chk = loadChk();
+    const allIds = MATERIALS.flatMap(g => g.items.map(it => it.id));
+    const done = allIds.filter(id => chk[id]).length, total = allIds.length;
+    const cell = it => { const c = chk[it.id]; return `
+      <label class="flex items-start gap-2.5 rounded-lg border border-outline-variant bg-surface-container-low/30 px-3 py-2.5 cursor-pointer hover:border-secondary/40 transition-colors">
+        <input type="checkbox" class="mat-chk mt-0.5 w-5 h-5 rounded text-secondary focus:ring-secondary cursor-pointer" data-id="${it.id}" ${c ? 'checked' : ''}/>
+        <div class="min-w-0 flex-1 ${c ? 'opacity-55' : ''}">
+          <div class="text-[13px] font-medium leading-snug ${c ? 'line-through' : ''}">${U.esc(it.label)}</div>
+          ${c ? `<div class="text-on-surface-variant text-[11px] mt-0.5">✓ ${U.esc(c.by)} ${U.esc(c.at)}</div>` : ''}
+        </div>
+      </label>`; };
+    document.getElementById('mat-board').innerHTML = `
+    <section class="card p-5 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">inventory</span>자료 준비 체크리스트 <span class="text-on-surface-variant font-normal text-[13px]">매주 나가는 자료 점검</span></h2>
+        <span class="chip border ${done === total ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-on-surface-variant border-outline-variant'}">${done}/${total} 완료</span>
+      </div>
+      <div class="h-1.5 rounded-full bg-surface-container-low overflow-hidden mb-4"><div class="h-full rounded-full bg-secondary transition-all" style="width:${done / total * 100}%"></div></div>
+      <div class="space-y-3.5">
+        ${MATERIALS.map(g => { const gd = g.items.filter(it => chk[it.id]).length; return `<div>
+          <div class="flex items-center gap-1.5 text-[13px] font-bold mb-2"><span class="material-symbols-outlined text-secondary text-[18px]">${g.icon}</span>${U.esc(g.group)} <span class="text-on-surface-variant font-normal">${gd}/${g.items.length}</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">${g.items.map(cell).join('')}</div>
+        </div>`; }).join('')}
+      </div>
+      <p class="text-on-surface-variant text-[11px] mt-3">체크는 이 기기에 저장되며 매주(일요일 기준) 자동으로 새로 시작됩니다.</p>
+    </section>`;
+    document.querySelectorAll('.mat-chk').forEach(c => c.addEventListener('change', () => {
+      const o = loadChk(); const me = document.getElementById('tk-worker').value;
+      if (c.checked) o[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete o[c.dataset.id];
+      saveChk(o); drawMaterials();
+    }));
+  }
+  drawMaterials();
 
   // ── 수시 업무 (DB 연동) ──
   function dday(due) {
