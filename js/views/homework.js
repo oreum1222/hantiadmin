@@ -31,8 +31,13 @@ Views.homework = function (el) {
     if (!box) return;
     const nameOf = {}; (clist || []).forEach(c => nameOf[c.id] = c.name);
 
-    // 집계 (허브에 매핑된 hwsys 강좌만)
+    // 집계 — 진행 중 강좌만 기본 표시, 종강 강좌는 토글 안으로
     const hwIds = [...new Set(Object.values(CONFIG.HW_COURSE_MAP || {}))];
+    const hwHubs = {}; // hwsysCourseId -> [허브 courseId]
+    Object.entries(CONFIG.HW_COURSE_MAP || {}).forEach(([hubId, hwId]) => { (hwHubs[hwId] = hwHubs[hwId] || []).push(hubId); });
+    const isActive = id => (hwHubs[id] || []).some(h => !App.courseEnded(h)); // 매핑된 허브 강좌 중 하나라도 진행 중이면 활성
+    const activeIds = hwIds.filter(isActive);
+    const endedIds = hwIds.filter(id => !isActive(id));
     const rosterCount = {}; roster.forEach(r => { rosterCount[r.courseId] = (rosterCount[r.courseId] || 0) + 1; });
     // 독려대상: courseId -> weekLabel -> [names]
     const pendMap = {};
@@ -41,9 +46,9 @@ Views.homework = function (el) {
       const wl = p.weekLabel || '(주차 미상)';
       ((pendMap[p.courseId] = pendMap[p.courseId] || {})[wl] = (pendMap[p.courseId][wl] || [])).push(p.name);
     });
-    const totalReg = hwIds.reduce((s, id) => s + (rosterCount[id] || 0), 0);
-    const totalPend = hwIds.reduce((s, id) => s + Object.values(pendMap[id] || {}).reduce((a, arr) => a + arr.length, 0), 0);
-    const activeWeeks = hwIds.reduce((s, id) => s + (assign[id] || []).filter(w => w.status === 'active').length, 0);
+    const totalReg = activeIds.reduce((s, id) => s + (rosterCount[id] || 0), 0);
+    const totalPend = activeIds.reduce((s, id) => s + Object.values(pendMap[id] || {}).reduce((a, arr) => a + arr.length, 0), 0);
+    const activeWeeks = activeIds.reduce((s, id) => s + (assign[id] || []).filter(w => w.status === 'active').length, 0);
 
     const nameChip = nm => {
       const st = (studentByName[nm] || [])[0];
@@ -53,17 +58,19 @@ Views.homework = function (el) {
 
     box.innerHTML = `
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-      ${statCard('link', '연동 강좌', hwIds.length + '개', '과제 검사 시스템 매핑')}
-      ${statCard('groups', '등록 학생', totalReg + '명', '과제 시스템 등록')}
+      ${statCard('link', '진행 중 강좌', activeIds.length + '개', '과제 검사 시스템 매핑')}
+      ${statCard('groups', '등록 학생', totalReg + '명', '진행 중 강좌 기준')}
       ${statCard('assignment_late', '독려 대상', totalPend + '명', '미완료(누적 큐)')}
       ${statCard('event_available', '진행 중 주차', activeWeeks + '개', 'active 과제')}
     </div>
 
-    ${hwIds.map(id => {
+    ${(() => { const renderCourse = id => {
       const weeks = assign[id] || [];
       const reg = rosterCount[id] || 0;
       const pend = pendMap[id] || {};
-      const names = (hubNames[id] || [nameOf[id] || id]);
+      const _hubs = (hwHubs[id] || []).map(h => App.courseOf(h)).filter(Boolean);
+      const _act = _hubs.filter(c => !App.courseEnded(c.id)).map(c => c.name);
+      const names = (_act.length ? _act : (_hubs.length ? _hubs.map(c => c.name) : [nameOf[id] || id]));
       const pendTotal = Object.values(pend).reduce((a, arr) => a + arr.length, 0);
       return `
       <section class="card overflow-hidden mb-4">
@@ -95,9 +102,9 @@ Views.homework = function (el) {
           </div>` : ''}
         </div>
       </section>`;
-    }).join('')}
+    }; return activeIds.map(renderCourse).join('') + (endedIds.length ? App.endedBox(endedIds.length, endedIds.map(renderCourse).join(''), false) : ''); })()}
 
-    <div class="card p-4 border-dashed !bg-transparent flex items-center gap-3 text-on-surface-variant text-[13px]">
+    <div class="card p-4 border-dashed !bg-transparent flex items-center gap-3 text-on-surface-variant text-[13px] mt-4">
       <span class="material-symbols-outlined text-[18px]">info</span>
       제출 원점수·정답률 등 상세는 학생 상세의 '복습시험 · 숙제 결과'와 원본 대시보드에서 확인하세요. (여기선 대용량 제출 데이터를 받지 않습니다.)
     </div>`;
