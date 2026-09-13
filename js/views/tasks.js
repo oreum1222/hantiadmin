@@ -32,6 +32,25 @@ Views.tasks = function (el) {
       { id: 'mat-su-3', label: '교재 및 워크북 해설지' },
     ] },
   ];
+
+  // ── 이번 주 확인 리스트(기간 한정, 조교 공용) · 전부 체크되면 자동으로 접힘 ──
+  // 다음 주 목록으로 교체할 땐 ver를 바꾸면 체크가 자동 초기화됩니다.
+  const WEEKCHECK = {
+    ver: '2026-09-13',
+    title: '이번 주 확인 (9/13~9/20)',
+    items: [
+      { id: 'wk-hongseoyul', label: '홍서율 처리 일괄', note: '대면 상담, 숙제 검사, 워크북, 가통 봉투 전부 미처리. 보강 여부 확인이 선행' },
+      { id: 'wk-munbeop-recheck', label: '현대문법 유형서 재검수', note: '9/13 12:18 인쇄 보류. 김도윤·배지환 전달 여부도 함께' },
+      { id: 'wk-iseojun-dup', label: '이서준 두 명 표기 구분', note: '진단 대시보드, 가통 작성 탭, 숙제 검사 제출 세 곳' },
+      { id: 'wk-hwaeon-112', label: '화언 3주차 112번 정답 확정', note: '책 5 / 파일 4' },
+      { id: 'wk-w3-review', label: '3주차 돌아보기 검수와 배부', note: '오늘 뺀 채로 인쇄, 검수 결과 없음' },
+      { id: 'wk-video-cert', label: '김수지·박민기 영상 인증 수령 확인' },
+      { id: 'wk-w5-paragraph', label: '5주차 교재 문단 나누기', note: '9/12 00:02 지시, 완료 보고 없음' },
+      { id: 'wk-kimseyeon-0728', label: '김세연 0728 검수사이트 추가', note: '9/13 10:06 요청, 처리 보고 없음' },
+      { id: 'wk-w4-recover', label: '4주차 교재 잔여분 회수', note: '유창에서 학원으로' },
+      { id: 'wk-jangijun-enroll', label: '장이준 수강 여부', note: '화요일 실장님 재확인' },
+    ],
+  };
   // 주(週) 식별: 가장 최근 지나간 '일요일 22:00'을 앵커로 (자료·정기 루틴 공통 기준)
   function weekKey() {
     const now = new Date();
@@ -74,6 +93,8 @@ Views.tasks = function (el) {
       <li><b class="text-amber-500">4)</b> 관리자 대시보드 <b>문자 발송 탭</b>에서 학생 및 학부모님 신규 문자 발송 <span class="text-on-surface-variant">(템플릿 저장돼 있음)</span></li>
     </ol>
   </section>
+
+  <div id="week-board"></div>
 
   <div id="mat-board"></div>
 
@@ -206,6 +227,53 @@ Views.tasks = function (el) {
     }));
   }
   drawMaterials();
+
+  // ── 이번 주 확인 리스트 렌더 (조교 공용 · 전부 완료 시 접힘) ──
+  const WK_ID = 'sys-weekcheck';
+  function loadWeek() {
+    const rec = (App.db.tasks || []).find(t => t.id === WK_ID);
+    let st = {}; if (rec && rec.detail) { try { st = JSON.parse(rec.detail) || {}; } catch (e) { st = {}; } }
+    return (st.ver === WEEKCHECK.ver) ? { ver: WEEKCHECK.ver, checks: st.checks || {} } : { ver: WEEKCHECK.ver, checks: {} };
+  }
+  async function saveWeek(state) {
+    return App.act('upsertTask', { id: WK_ID, title: '[시스템] 주간 확인 체크', status: '완료', assignee: '', detail: JSON.stringify(state) });
+  }
+  function drawWeek() {
+    const chk = loadWeek().checks;
+    const items = WEEKCHECK.items;
+    const done = items.filter(it => chk[it.id]).length, total = items.length;
+    const allDone = done === total;
+    const body = items.map(it => { const c = chk[it.id]; return `
+      <label class="flex items-start gap-3 py-2.5 border-b border-outline-variant last:border-0 cursor-pointer">
+        <input type="checkbox" class="wk-chk mt-0.5 w-5 h-5 rounded text-secondary focus:ring-secondary cursor-pointer" data-id="${it.id}" ${c ? 'checked' : ''}/>
+        <div class="min-w-0 flex-1 ${c ? 'opacity-55' : ''}">
+          <div class="text-[13.5px] font-semibold ${c ? 'line-through' : ''}">${U.esc(it.label)}</div>
+          ${it.note ? `<div class="text-on-surface-variant text-[12px] mt-0.5">${U.esc(it.note)}</div>` : ''}
+          ${c ? `<div class="text-on-surface-variant text-[11px] mt-0.5">✓ ${U.esc(c.by)} ${U.esc(c.at)}</div>` : ''}
+        </div>
+      </label>`; }).join('');
+    document.getElementById('week-board').innerHTML = `
+    <details class="card mb-6 overflow-hidden group"${allDone ? '' : ' open'}>
+      <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none px-5 py-3.5 flex items-center justify-between gap-2 ${allDone ? 'bg-secondary-fixed/30' : ''}">
+        <span class="flex items-center gap-2 font-bold text-[16px] min-w-0">
+          <span class="material-symbols-outlined text-[20px] ${allDone ? 'text-secondary' : 'text-amber-500'}">${allDone ? 'task_alt' : 'event_note'}</span>
+          <span class="truncate">${U.esc(WEEKCHECK.title)}</span>
+          <span class="chip border shrink-0 ${allDone ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-amber-500 border-amber-500/30 bg-amber-500/10'}">${done}/${total}${allDone ? ' 완료' : ''}</span>
+        </span>
+        <span class="material-symbols-outlined text-on-surface-variant transition-transform duration-200 group-open:rotate-180 shrink-0">expand_more</span>
+      </summary>
+      <div class="px-5 pb-4 border-t border-outline-variant">${body}</div>
+    </details>`;
+    document.querySelectorAll('.wk-chk').forEach(c => c.addEventListener('change', async () => {
+      const state = loadWeek(); const me = document.getElementById('tk-worker').value;
+      if (c.checked) state.checks[c.dataset.id] = { by: me, at: U.today().slice(5) }; else delete state.checks[c.dataset.id];
+      c.disabled = true;
+      const ok = await saveWeek(state);
+      c.disabled = false;
+      if (ok) drawWeek(); else c.checked = !c.checked;
+    }));
+  }
+  drawWeek();
 
   // ── 수시 업무 (DB 연동) ──
   function dday(due) {
