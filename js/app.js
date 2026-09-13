@@ -165,6 +165,7 @@ window.App = {
   // ── 라우터 ──
   MENUS: [
     { id: 'home', label: '홈', icon: 'space_dashboard' },
+    { id: 'tasks', label: '조교 확인', icon: 'checklist' },
     { id: 'courses', label: '강의', icon: 'menu_book' },
     { id: 'students', label: '학생', icon: 'groups' },
     { id: 'admissions', label: '입시', icon: 'account_balance' },
@@ -172,7 +173,6 @@ window.App = {
     { id: 'makeup', label: '보강', icon: 'event_repeat' },
     { id: 'notices', label: '공지', icon: 'campaign' },
     { id: 'message', label: '문자 발송', icon: 'sms' },
-    { id: 'tasks', label: '조교 확인', icon: 'checklist' },
     { id: 'diagnosis', label: '성향 진단', icon: 'psychology' },
     { id: 'homework', label: '과제', icon: 'assignment_turned_in' },
     { id: 'review', label: '복습시험', icon: 'quiz', url: 'https://oreum1222.github.io/oreum-study/dashboard.html' },
