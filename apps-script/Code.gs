@@ -37,9 +37,15 @@ function initSheets() {
 }
 
 function checkPin_(pin) {
+  if (!pin) return null;
+  pin = String(pin).trim();
   var props = PropertiesService.getScriptProperties();
-  if (pin && pin === props.getProperty('MASTER_PIN')) return 'master';
-  if (pin && pin === props.getProperty('STAFF_PIN')) return 'staff';
+  // MASTER_PIN / STAFF_PIN은 콤마로 여러 개 지정 가능 (예: "1234,5678"). 단일 값도 그대로 동작.
+  var list = function (key) {
+    return (props.getProperty(key) || '').split(',').map(function (s) { return s.trim(); }).filter(String);
+  };
+  if (list('MASTER_PIN').indexOf(pin) >= 0) return 'master';
+  if (list('STAFF_PIN').indexOf(pin) >= 0) return 'staff';
   return null;
 }
 
