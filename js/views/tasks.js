@@ -8,6 +8,8 @@ Views.tasks = function (el) {
   const ROUTINE = [
     { id: 'am-print', phase: '수업 전', when: '일 09:05', cls: '현대문법 내신', staff: '규민·경은', task: '워크북 출력 부수 확인', note: '예담T 최종본·노션 기준' },
     { id: 'pm-print', phase: '수업 전', when: '일 13:05', cls: '수능 국어반', staff: '규민·경은·채현·재희', task: '워크북 출력 부수 확인', note: '예담T 최종본·노션 기준' },
+    { id: 'he-handout', phase: '수업 전', when: '수업 전', cls: '화법과 언어', staff: '조교', task: '학교별 유인물 있는지 확인' },
+    { id: 'he-distribute', phase: '수업 전', when: '수업 전', cls: '화법과 언어', staff: '조교', task: '학교별 자료 배부 확인' },
     { id: 'am-collect', phase: '수업 중', when: '일 09:55', cls: '현대문법 내신', staff: '규민·경은', task: '숙제 검사', subs: ['워크북 걷기', '워크북 과제 코멘트 작성 (학생 워크북에 기록 + 우리 단톡에 기록)', '모든 사항 단톡에 공유'] },
     { id: 'am-missing', phase: '수업 중', when: '일 10:55', cls: '현대문법 내신', staff: '규민·경은', task: '과제 점검 시스템 미제출자 제출하게 하기', note: '학습 진단 등 · 하원 전 무조건' },
     { id: 'am-observe', phase: '수업 중', when: '수업 중', cls: '현대문법 내신', staff: '규민·경은', task: '수업 중 학생 관찰', note: '수업 태도·이해도 등 특이사항 기록' },
