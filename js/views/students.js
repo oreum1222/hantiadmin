@@ -320,19 +320,20 @@ Views._studentForm = function (studentId) {
 // ── 학습 성향 진단(fassessment) 라이브 연동 ──
 Views._faData = function () {
   if (!window.__FA_DIAG) {
-    if (Array.isArray(window.FA_SNAPSHOT)) {
-      // 구워둔 스냅샷 우선 (오프라인·file:// 에서도 즉시 표시)
-      window.__FA_DIAG = Promise.resolve(window.FA_SNAPSHOT);
-    } else if (CONFIG.SCRIPT_URL) {
-      // 라이브 모드: PIN 인증된 운영허브 백엔드가 릴레이 (키 노출 없음)
+    // 스냅샷은 '폴백'으로만 사용 — 라이브 릴레이가 비거나 실패할 때만 표시(자동 연동을 우선한다).
+    const snap = Array.isArray(window.FA_SNAPSHOT) ? window.FA_SNAPSHOT : [];
+    if (CONFIG.SCRIPT_URL) {
+      // 라이브: PIN 인증된 운영허브 백엔드가 fassessment를 릴레이(키 노출 없음). 매주 새 응답이 자동 반영됨.
       const u = CONFIG.SCRIPT_URL + '?pin=' + encodeURIComponent(App.pin) + '&action=faList';
-      window.__FA_DIAG = fetch(u).then(r => r.json()).then(j => j.list || []).catch(() => []);
+      window.__FA_DIAG = fetch(u).then(r => r.json())
+        .then(j => (j && Array.isArray(j.list) && j.list.length) ? j.list : snap)
+        .catch(() => snap);
     } else if (CONFIG.FASSESSMENT_KEY) {
       // 데모/로컬: fassessment 직접 조회 (키가 로컬 설정에 있을 때만)
       const u = CONFIG.FASSESSMENT_URL + '?key=' + encodeURIComponent(CONFIG.FASSESSMENT_KEY) + '&action=v2List';
-      window.__FA_DIAG = fetch(u).then(r => r.json()).catch(() => []);
+      window.__FA_DIAG = fetch(u).then(r => r.json()).then(l => (Array.isArray(l) && l.length) ? l : snap).catch(() => snap);
     } else {
-      window.__FA_DIAG = Promise.resolve([]);
+      window.__FA_DIAG = Promise.resolve(snap);
     }
   }
   return window.__FA_DIAG;
