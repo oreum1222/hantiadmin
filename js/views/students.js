@@ -150,6 +150,11 @@ function renderStudent(el, studentId) {
 
     ${Views._reviewHTML(s)}
 
+    <section class="card p-5 lg:col-span-2">
+      <h2 class="font-bold text-[16px] mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">assignment_turned_in</span>과제 검사 결과 <span class="text-on-surface-variant font-normal text-[13px]">(과제 검사 시스템 · 실시간 · 주차별 전체)</span></h2>
+      <div id="hw-live-body"><p class="text-on-surface-variant text-[13px] py-2">불러오는 중…</p></div>
+    </section>
+
     ${Views._admissionHTML(s)}
 
     ${s.consult ? `
@@ -188,6 +193,7 @@ function renderStudent(el, studentId) {
   </div>`;
 
   Views._fillDiag(s);
+  Views._fillHomework(s);
 }
 
 // ── 복습시험 · 숙제 결과 섹션 ──
@@ -215,6 +221,46 @@ Views._reviewHTML = function (s) {
       ${rv.weak ? `<div class="text-[13px] mb-1"><span class="text-on-surface-variant">취약 · 특이</span> ${U.esc(rv.weak)}</div>` : ''}
       ${(rv.hw && rv.hw.length) ? `<div class="mt-2.5"><div class="text-[13px] font-bold mb-1">숙제 검사</div><ul class="text-[13px] text-on-surface-variant space-y-1">${rv.hw.map(h => `<li>– ${U.esc(h)}</li>`).join('')}</ul></div>` : ''}
     </section>`;
+};
+
+// ── 과제 검사 결과 (hwsys 실시간, 주차별 전체) — 이름+학교로 동명이인 분리 ──
+Views._fillHomework = function (s) {
+  const box = document.getElementById('hw-live-body'); if (!box) return;
+  Promise.all([App.hwSubmissions(), App.hwCourseList()]).then(([rows, clist]) => {
+    if (!box.isConnected) return;
+    const nameOf = {}; (clist || []).forEach(c => nameOf[c.id] = c.name);
+    const LEGACY = { 'hanti-dan-h2-hwaeon': '고2 화법과 언어(여름)', 'hanti-jong-m3-hyeonbeop': '중3 현대문법', 'hanti-jong-h1-gojeonbeop': '고1 고전문법', 'hanti-dan-h1-gojeon': '고1 고전 영역', 'hanti-dan-h1-gojeonmunhak': '고1 고전(문학)', 'hanti-dan-h1-gojeonbeop': '고1 고전(문법)' };
+    const cName = id => nameOf[id] || LEGACY[id] || id;
+    const mine = App.hwForStudent(rows, s);
+    if (!mine.length) { box.innerHTML = '<p class="text-on-surface-variant text-[13px] py-2">과제 검사 제출 기록이 없습니다.</p>'; return; }
+    const latest = {};
+    mine.forEach(r => { const k = r.courseId + '|' + (parseInt(r.week, 10) || 0); if (!latest[k] || String(r.timestamp || '') > String(latest[k].timestamp || '')) latest[k] = r; });
+    const list = Object.values(latest).sort((a, b) => String(a.courseId).localeCompare(String(b.courseId)) || (parseInt(a.week, 10) || 0) - (parseInt(b.week, 10) || 0));
+    const num = v => { const n = parseFloat(String(v ?? '').replace('%', '').trim()); return isNaN(n) ? null : (n <= 1 && n > 0 ? Math.round(n * 100) : Math.round(n)); };
+    const pill = (label, v) => `<span class="chip border ${v == null ? 'text-on-surface-variant border-outline-variant' : (v >= 80 ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : v >= 60 ? 'text-yellow-600 border-yellow-500/40 bg-yellow-500/10' : 'text-red-400 border-red-400/30 bg-red-400/10')}">${label} ${v == null ? '—' : v + '%'}</span>`;
+    box.innerHTML = list.map(r => {
+      const oath = String(r.제출방식 || '').indexOf('각서') >= 0;
+      const solve = num(r.과제해결정도), rate = oath ? null : num(r.정답률);
+      const tot = r.총문항 || '', cor = r.맞은개수 || '', wr = r.틀린개수 || '';
+      let wrongs = []; try { wrongs = JSON.parse(r.wrongDetailsJson || '[]') || []; } catch (e) { }
+      const wrongNos = String(r.틀린문항 || '').trim();
+      const diag = String(r.학습진단 || '').trim(), reason = String(r.미완사유 || '').trim();
+      return `<div class="rounded-xl border border-outline-variant p-4 mb-3">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="font-bold text-[14px]">${U.esc(cName(r.courseId))}</span>
+          <span class="chip border text-on-surface-variant border-outline-variant">${U.esc(r.weekLabel || ((parseInt(r.week, 10) || '?') + '주차'))}</span>
+          ${oath ? '<span class="chip border text-amber-500 border-amber-500/30 bg-amber-500/10">각서(미제출)</span>' : ''}
+          <span class="text-on-surface-variant text-[12px] ml-auto">${U.esc(String(r.timestamp || '').slice(0, 10))}</span>
+        </div>
+        ${oath ? `<p class="text-on-surface-variant text-[13px]">${U.esc(reason || '숙제 미제출 — 각서 제출')}</p>`
+          : `<div class="flex flex-wrap gap-1.5 mb-2">${pill('완수율', solve)}${pill('정답률', rate)}${tot ? `<span class="chip border text-on-surface-variant border-outline-variant">${U.esc(cor)}/${U.esc(tot)} 정답${wr !== '' ? ` · 틀림 ${U.esc(wr)}` : ''}</span>` : ''}</div>
+             ${wrongNos ? `<div class="text-[12px] text-on-surface-variant mb-1"><b>틀린 문항</b> ${U.esc(wrongNos)}</div>` : ''}
+             ${wrongs.length ? `<details class="mt-1"><summary class="cursor-pointer text-[12px] text-secondary font-bold">오답 상세 ${wrongs.length}개 보기</summary>
+               <ul class="mt-2 text-[12px] text-on-surface-variant space-y-1">${wrongs.map(w => `<li>– <b>${U.esc(w.label || ('no' + w.no))}</b>${w.area ? ` <span class="opacity-70">[${U.esc(w.area)}]</span>` : ''}${w.coreElement ? ' ' + U.esc(w.coreElement) : ''}${w.remediation ? `<br><span class="opacity-80">↳ ${U.esc(w.remediation)}</span>` : ''}</li>`).join('')}</ul></details>` : ''}`}
+        ${diag ? `<div class="text-[12px] mt-2">${diag.split('|').map(t => `<span class="chip border border-outline-variant mr-1">${U.esc(t.trim())}</span>`).join('')}</div>` : ''}
+      </div>`;
+    }).join('');
+  }).catch(() => { if (box) box.innerHTML = '<p class="text-red-400 text-[13px] py-2">과제 결과를 불러오지 못했습니다.</p>'; });
 };
 
 // ── 입시 조사 섹션 (고3 수능 정규반) ──
