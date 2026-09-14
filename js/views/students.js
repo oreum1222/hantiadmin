@@ -385,7 +385,11 @@ Views._faData = function () {
   return window.__FA_DIAG;
 };
 Views._faRecords = function (name, data) {
-  const rs = (data || []).filter(r => r['이름'] === name || r['이름'] === name + 'A');
+  // 동명이인 학교병기 지원: "이서준(과천)" → 이름=이서준 매칭 + 학교에 '과천' 포함하는 행만(없으면 없음). 접미사 없으면 기존 이름 매칭.
+  const base = String(name || '').replace(/\s*\([^)]*\)\s*$/, '');
+  const tok = (String(name || '').match(/\(([^)]+)\)\s*$/) || [])[1] || '';
+  let rs = (data || []).filter(r => r['이름'] === base || r['이름'] === base + 'A');
+  if (tok) rs = rs.filter(r => String(r['학교'] || '').indexOf(tok) >= 0);
   const pick = v => rs.filter(r => r['버전'] === v).sort((a, b) => String(b['제출시각'] || '').localeCompare(String(a['제출시각'] || '')))[0] || null;
   return { first: pick('재원생 첫'), summer: pick('summer'), parent: pick('학부모관찰') };
 };
