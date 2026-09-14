@@ -24,8 +24,12 @@ Views.diagnosis = function (el) {
   Views._faData().then(data => {
     const box = document.getElementById('fadash');
     if (!box) return;
-    const studs = App.db.students.filter(s => s.status === '재원')
+    // 진행 중 수업 학생만 기본 표시 — 강좌 중 하나라도 진행 중이면 '진행 중', 전부 종강이면 '종강 반'
+    const isActiveStud = s => App.coursesOf(s.id).some(c => !App.courseEnded(c.id));
+    const allStuds = App.db.students.filter(s => s.status === '재원')
       .map(s => ({ s, r: Views._faRecords(s.name, data) }));
+    const studs = allStuds.filter(x => isActiveStud(x.s));       // 진행 중
+    const studsEnded = allStuds.filter(x => !isActiveStud(x.s));  // 종강 반(진행 중 강좌 없음)
     const total = studs.length;
     const nFirst = studs.filter(x => x.r.first).length;
     const nSummer = studs.filter(x => x.r.summer).length;
@@ -52,6 +56,20 @@ Views.diagnosis = function (el) {
       .sort((a, b) => b.low - a.low || a.min - b.min);
     const noResp = studs.filter(x => !x.r.first && !x.r.summer).map(x => x.s)
       .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+    // 응답자 표 렌더러 (진행 중/종강 공용)
+    const respRows = list => list.slice().sort((a, b) => a.s.name.localeCompare(b.s.name, 'ko')).map(({ s, r }) => `
+          <tr class="row-click" onclick="location.hash='#students/${s.id}'">
+            <td class="font-bold">${U.esc(s.name)}</td>
+            <td class="text-[13px] text-on-surface-variant">${U.esc(s.school)} ${U.esc(s.grade)}</td>
+            <td>${r.first['페르소나'] ? `<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">${U.esc(r.first['페르소나'])}</span>` : '—'}</td>
+            ${AX.map(([, k]) => { const v = r.first[k]; const n = typeof v === 'number' ? v : null; return `<td class="text-center text-[13px] font-semibold ${n != null && n < 40 ? 'text-red-400' : n != null && n >= 75 ? 'text-secondary' : ''}">${n == null ? '—' : n}</td>`; }).join('')}
+            <td class="text-[12px] text-on-surface-variant">${[r.summer ? '여름' : '', r.parent ? '학부모' : '', s.consult ? '대면' : ''].filter(Boolean).join('·') || '첫진단'}</td>
+          </tr>`).join('');
+    const respTable = list => `<div class="overflow-x-auto"><table class="tbl min-w-[720px]">
+        <thead><tr><th>이름</th><th>학교·학년</th><th>페르소나</th>${AX.map(a => `<th class="text-center">${a[0].replace(' ', '<br>')}</th>`).join('')}<th class="w-24">완료</th></tr></thead>
+        <tbody>${respRows(list)}</tbody></table></div>`;
+    const withFirstEnded = studsEnded.filter(x => x.r.first);
 
     const rate = total ? Math.round(nFirst / total * 100) : 0;
     box.innerHTML = `
@@ -83,19 +101,16 @@ Views.diagnosis = function (el) {
 
     <section class="card overflow-hidden mb-4">
       <div class="px-5 py-3.5 border-b border-outline-variant flex items-center justify-between">
-        <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">table_rows</span>응답자 (${withFirst.length}명)</h2>
+        <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">table_rows</span>응답자 <span class="text-on-surface-variant font-normal text-[13px]">진행 중 ${withFirst.length}명</span></h2>
       </div>
-      <div class="overflow-x-auto"><table class="tbl min-w-[720px]">
-        <thead><tr><th>이름</th><th>학교·학년</th><th>페르소나</th>${AX.map(a => `<th class="text-center">${a[0].replace(' ', '<br>')}</th>`).join('')}<th class="w-24">완료</th></tr></thead>
-        <tbody>${withFirst.sort((a, b) => a.s.name.localeCompare(b.s.name, 'ko')).map(({ s, r }) => `
-          <tr class="row-click" onclick="location.hash='#students/${s.id}'">
-            <td class="font-bold">${U.esc(s.name)}</td>
-            <td class="text-[13px] text-on-surface-variant">${U.esc(s.school)} ${U.esc(s.grade)}</td>
-            <td>${r.first['페르소나'] ? `<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">${U.esc(r.first['페르소나'])}</span>` : '—'}</td>
-            ${AX.map(([, k]) => { const v = r.first[k]; const n = typeof v === 'number' ? v : null; return `<td class="text-center text-[13px] font-semibold ${n != null && n < 40 ? 'text-red-400' : n != null && n >= 75 ? 'text-secondary' : ''}">${n == null ? '—' : n}</td>`; }).join('')}
-            <td class="text-[12px] text-on-surface-variant">${[r.summer ? '여름' : '', r.parent ? '학부모' : '', s.consult ? '대면' : ''].filter(Boolean).join('·') || '첫진단'}</td>
-          </tr>`).join('')}</tbody>
-      </table></div>
+      ${respTable(withFirst)}
+      ${withFirstEnded.length ? `<details class="group border-t border-outline-variant">
+        <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none px-5 py-3 flex items-center justify-between gap-2 hover:bg-surface-container-low/50">
+          <span class="flex items-center gap-2 font-bold text-[13.5px] text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">inventory_2</span>종강 반 학생 <span class="chip border border-outline-variant text-on-surface-variant">${withFirstEnded.length}</span><span class="text-[12px] font-normal opacity-70">클릭하여 펼치기</span></span>
+          <span class="material-symbols-outlined text-on-surface-variant transition-transform duration-200 group-open:rotate-180">expand_more</span>
+        </summary>
+        ${respTable(withFirstEnded)}
+      </details>` : ''}
     </section>
 
     ${noResp.length ? `<section class="card p-5">
