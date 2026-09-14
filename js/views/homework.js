@@ -26,18 +26,37 @@ Views.homework = function (el) {
   const studentByName = {};
   App.db.students.forEach(s => { (studentByName[s.name] = studentByName[s.name] || []).push(s); });
 
-  Promise.all([App.hwAssignments(), App.hwRoster(), App.hwPending(), App.hwCourseList()]).then(([assign, roster, pending, clist]) => {
+  Promise.all([App.hwAssignments(), App.hwRoster(), App.hwPending(), App.hwCourseList(), App.hwSubmissions()]).then(([assign, roster, pending, clist, subs]) => {
     const box = document.getElementById('hwdash');
     if (!box) return;
     const nameOf = {}; (clist || []).forEach(c => nameOf[c.id] = c.name);
 
     // 집계 — 진행 중 강좌만 기본 표시, 종강 강좌는 토글 안으로
-    const hwIds = [...new Set(Object.values(CONFIG.HW_COURSE_MAP || {}))];
+    const hwIds = [...new Set([...Object.values(CONFIG.HW_COURSE_MAP || {}), ...(CONFIG.HW_ACTIVE || [])])];
     const hwHubs = {}; // hwsysCourseId -> [허브 courseId]
     Object.entries(CONFIG.HW_COURSE_MAP || {}).forEach(([hubId, hwId]) => { (hwHubs[hwId] = hwHubs[hwId] || []).push(hubId); });
-    const isActive = id => (hwHubs[id] || []).some(h => !App.courseEnded(h)); // 매핑된 허브 강좌 중 하나라도 진행 중이면 활성
+    const isActive = id => (CONFIG.HW_ACTIVE || []).includes(id);
     const activeIds = hwIds.filter(isActive);
     const endedIds = hwIds.filter(id => !isActive(id));
+
+    // 제출 결과 집계: courseId -> weekNo -> {n 제출, oath 각서, 완수율평균, 정답률평균} (학생별 최신 1건, 이름+학교로 동명이인 분리)
+    const num = v => { const n = parseFloat(String(v ?? '').replace('%', '').trim()); return isNaN(n) ? null : (n <= 1 && n > 0 ? n * 100 : n); };
+    const latest = {};
+    (subs || []).forEach(r => {
+      const cid = r.courseId; if (!hwIds.includes(cid)) return;
+      const w = parseInt(r.week, 10) || 0; if (!w) return;
+      const k = cid + '|' + w + '|' + App.hwBaseName(r.name) + '|' + App.hwSchoolNorm(r.school);
+      if (!latest[k] || String(r.timestamp || '') > String(latest[k].timestamp || '')) latest[k] = r;
+    });
+    const subAgg = {};
+    Object.values(latest).forEach(r => {
+      const cid = r.courseId, w = parseInt(r.week, 10) || 0;
+      const A = ((subAgg[cid] = subAgg[cid] || {})[w] = subAgg[cid][w] || { n: 0, oath: 0, sSum: 0, sN: 0, rSum: 0, rN: 0 });
+      const oath = String(r.제출방식 || '').indexOf('각서') >= 0;
+      const sv = num(r.과제해결정도), rv = oath ? null : num(r.정답률);
+      A.n++; if (oath) A.oath++; if (sv != null) { A.sSum += sv; A.sN++; } if (rv != null) { A.rSum += rv; A.rN++; }
+    });
+    const aggOf = (cid, w) => { const a = (subAgg[cid] || {})[w]; if (!a) return null; return { n: a.n, oath: a.oath, solve: a.sN ? Math.round(a.sSum / a.sN) : null, rate: a.rN ? Math.round(a.rSum / a.rN) : null }; };
     const rosterCount = {}; roster.forEach(r => { rosterCount[r.courseId] = (rosterCount[r.courseId] || 0) + 1; });
     // 독려대상: courseId -> weekLabel -> [names]
     const pendMap = {};
@@ -83,15 +102,17 @@ Views.homework = function (el) {
         </div>
         <div class="p-5">
           <div class="text-[12px] font-bold text-on-surface-variant mb-2">주차별 과제</div>
-          ${weeks.length ? `<div class="overflow-x-auto"><table class="tbl min-w-[560px]">
-            <thead><tr><th class="w-16">주차</th><th>과제</th><th class="w-28">영역</th><th class="w-32">기간</th><th class="w-16">상태</th></tr></thead>
-            <tbody>${weeks.map(w => `<tr>
+          ${weeks.length ? `<div class="overflow-x-auto"><table class="tbl min-w-[620px]">
+            <thead><tr><th class="w-14">주차</th><th>과제</th><th class="w-24">검사일</th><th class="w-14">제출</th><th class="w-16">완수율</th><th class="w-16">정답률</th><th class="w-14">상태</th></tr></thead>
+            <tbody>${weeks.map(w => { const ag = aggOf(id, w.w); return `<tr>
               <td class="text-[13px] font-semibold">${w.month ? U.esc(w.month) + ' ' : ''}${w.w != null ? w.w + '주' : '—'}</td>
               <td class="text-[13px]">${U.esc(w.label.replace(/^\s*\d[\d\-]*\s*주차(에 한 숙제 검사)?\s*[·:\-—]\s*/, ''))}</td>
-              <td class="text-[12px] text-on-surface-variant">${U.esc(w.area || '—')}</td>
               <td class="text-[12px] text-on-surface-variant">${U.esc(w.date || '—')}</td>
+              <td class="text-[13px]">${ag ? ag.n + '명' + (ag.oath ? ` <span class="text-[11px] text-amber-500">(각서 ${ag.oath})</span>` : '') : '—'}</td>
+              <td class="text-[13px]">${ag && ag.solve != null ? ag.solve + '%' : '—'}</td>
+              <td class="text-[13px] font-semibold">${ag && ag.rate != null ? ag.rate + '%' : '—'}</td>
               <td>${w.status === 'active' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">진행</span>' : w.status === 'tentative' ? '<span class="chip border text-on-surface-variant border-outline-variant">예정</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">마감</span>'}</td>
-            </tr>`).join('')}</tbody></table></div>` : '<p class="text-on-surface-variant text-[13px]">등록된 주차 과제가 없습니다.</p>'}
+            </tr>`; }).join('')}</tbody></table></div>` : '<p class="text-on-surface-variant text-[13px]">등록된 주차 과제가 없습니다.</p>'}
 
           ${pendTotal ? `<div class="mt-4">
             <div class="text-[12px] font-bold text-amber-500 mb-2">미완료 · 독려 대상</div>

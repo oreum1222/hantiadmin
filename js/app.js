@@ -130,6 +130,29 @@ window.App = {
     }
     return window.__HW_PENDING;
   },
+  // 과제 검사 제출 결과(완수율·정답률·틀린문항·오답상세·코멘트) — 대용량 list(≈6MB) 1회 로드·캐시
+  hwSubmissions() {
+    if (!window.__HW_LIST) {
+      window.__HW_LIST = fetch(CONFIG.SEND_URL + '?action=list').then(r => r.json())
+        .then(d => { const rows = Array.isArray(d) ? d : (d && d.rows) || []; return rows.filter(x => x && x.name && String(x.name).indexOf('실험용') < 0 && String(x.name).indexOf('테스트') < 0); })
+        .catch(() => []);
+    }
+    return window.__HW_LIST;
+  },
+  // 학교명 정규화(표기차 흡수) · 전화 뒤 4자리 — 동명이인 구분용
+  hwSchoolNorm(s) { return String(s || '').replace(/\s/g, '').replace(/고?등학교$/, '고').replace(/고고$/, '고').replace(/외국어고$/, '외고'); },
+  phone4(p) { const d = String(p || '').replace(/\D/g, ''); return d.slice(-4); },
+  hwBaseName(n) { return String(n || '').split('(')[0].replace(/\s/g, '').trim(); },
+  // 한 학생(허브)의 hwsys 제출들 — 이름(괄호 제거)+학교로 매칭(학교 다르면 제외 → 동명이인 분리)
+  hwForStudent(rows, stu) {
+    const bn = App.hwBaseName(stu.name), sc = App.hwSchoolNorm(stu.school);
+    return (rows || []).filter(r => {
+      if (App.hwBaseName(r.name) !== bn) return false;
+      const rsc = App.hwSchoolNorm(r.school);
+      if (sc && rsc) return sc === rsc;   // 양쪽 학교 있으면 일치해야
+      return true;                         // 한쪽 미상이면 이름만으로 허용
+    });
+  },
 
   // ── 액션 실행 (저장 중 토스트 → 성공/실패) ──
   async act(action, payload, okMsg) {
