@@ -15,17 +15,20 @@ window.CONFIG = {
 
   // 허브 강좌 id ↔ 과제 검사 시스템(hwsys) courseId 매핑.
   //  h2  = 고2 단과 화법과 언어 → 현재 '화법과언어(연합반)'
-  //  g2cs= 고2 수능 정규반('우리들의 첫 수능', 한티 MEXX — 오름 go3 정규반과 다른 학원)
+  //  g2cs= 고2 수능 정규반('우리들의 첫 수능', 한티 MEXX)
+  //  g3f/g3s = 오름 수능 정규반(금/토) → go3-regular (사용자 요청으로 과제 탭 포함)
   //  h1/sm3/sh1 = 종강(고1 고전 · 중3 현대문법 · 고1 고전문법)
   HW_COURSE_MAP: {
     h2:   'hanti-dan-h2-hwaeon2',
     g2cs: 'hanti-dan-h2-suneung',
+    g3f:  'go3-regular',
+    g3s:  'go3-regular',
     h1:   'hanti-dan-h1-gojeon',
     sm3:  'hanti-jong-m3-hyeonbeop',
     sh1:  'hanti-jong-h1-gojeonbeop',
   },
-  // 과제 탭에서 '진행 중'으로 볼 hwsys courseId (없으면 종강 토글). 오름/고3는 제외(다른 학원).
-  HW_ACTIVE: ['hanti-dan-h2-hwaeon2', 'hanti-dan-h2-suneung'],
+  // 과제 탭에서 '진행 중'으로 볼 hwsys courseId (없으면 종강 토글). 오름 수능정규반(go3-regular) 포함.
+  HW_ACTIVE: ['hanti-dan-h2-hwaeon2', 'hanti-dan-h2-suneung', 'go3-regular'],
 
   // 데모 모드 전용 PIN (라이브 모드에서는 서버에서 검증 — 실제 PIN을 여기 두지 말 것)
   DEMO_PIN_MASTER: '0000',
