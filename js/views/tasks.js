@@ -29,9 +29,22 @@ Views.tasks = function (el) {
       { id: 'mat-hy-3', label: '전주차 오답률 자료' },
     ] },
     { group: '수능 국어', icon: 'menu_book', items: [
-      { id: 'mat-su-1', label: '교재' },
-      { id: 'mat-su-2', label: '워크북' },
-      { id: 'mat-su-3', label: '교재 및 워크북 해설지' },
+      { id: 'mat-su-1', label: '교재', steps: [
+        { id: 'a', label: '밑작업 완료', by: '조교' },
+        { id: 'b', label: '함께 읽기 작성', by: '가경T' },
+        { id: 'c', label: '최종 검수 및 수정', by: '조교' },
+      ] },
+      { id: 'mat-su-2', label: '워크북', steps: [
+        { id: 'a', label: '취합', by: '가경T' },
+        { id: 'b', label: '검수 및 수정', by: '조교' },
+        { id: 'c', label: '돌아보기 자료', by: '가경T' },
+        { id: 'd', label: '돌아보기 자료 검수', by: '조교' },
+      ] },
+      { id: 'mat-su-3', label: '교재 및 워크북 해설지', steps: [
+        { id: 'a', label: '교재 해설지 초안', by: '경은' },
+        { id: 'b', label: '워크북 해설지 초안', by: '재희' },
+        { id: 'c', label: '최종 전달', by: '' },
+      ] },
     ] },
   ];
 
@@ -192,10 +205,22 @@ Views.tasks = function (el) {
   async function saveMat(state) {
     return App.act('upsertTask', { id: MAT_ID, title: '[시스템] 자료 준비 체크', status: '완료', assignee: '', detail: JSON.stringify(state) });
   }
+  // 항목의 리프(체크 단위) id 목록: 하위 단계가 있으면 각 단계, 없으면 항목 자체
+  function matLeaves(it) { return it.steps ? it.steps.map(s => it.id + '-' + s.id) : [it.id]; }
   function drawMaterials() {
     const chk = loadMat().checks;
-    const allIds = MATERIALS.flatMap(g => g.items.map(it => it.id));
+    const allIds = MATERIALS.flatMap(g => g.items.flatMap(matLeaves));
     const done = allIds.filter(id => chk[id]).length, total = allIds.length;
+    // 단계 한 줄
+    const stepRow = (lid, label, by) => { const c = chk[lid]; return `
+      <label class="flex items-start gap-2 py-1.5 cursor-pointer">
+        <input type="checkbox" class="mat-chk mt-0.5 w-[18px] h-[18px] rounded text-secondary focus:ring-secondary cursor-pointer" data-id="${lid}" ${c ? 'checked' : ''}/>
+        <div class="min-w-0 flex-1 ${c ? 'opacity-55' : ''}">
+          <div class="text-[12.5px] leading-snug ${c ? 'line-through' : ''}">${U.esc(label)}${by ? ` <span class="text-on-surface-variant text-[11px]">· ${U.esc(by)}</span>` : ''}</div>
+          ${c ? `<div class="text-on-surface-variant text-[10.5px]">✓ ${U.esc(c.by)} ${U.esc(c.at)}</div>` : ''}
+        </div>
+      </label>`; };
+    // 단일 체크 항목(하위 단계 없음)
     const cell = it => { const c = chk[it.id]; return `
       <label class="flex items-start gap-2.5 rounded-lg border border-outline-variant bg-surface-container-low/30 px-3 py-2.5 cursor-pointer hover:border-secondary/40 transition-colors">
         <input type="checkbox" class="mat-chk mt-0.5 w-5 h-5 rounded text-secondary focus:ring-secondary cursor-pointer" data-id="${it.id}" ${c ? 'checked' : ''}/>
@@ -204,17 +229,26 @@ Views.tasks = function (el) {
           ${c ? `<div class="text-on-surface-variant text-[11px] mt-0.5">✓ ${U.esc(c.by)} ${U.esc(c.at)}</div>` : ''}
         </div>
       </label>`; };
+    // 하위 단계 항목(교재/워크북/해설지) — 제목 + 진행 + 단계들
+    const stepCard = it => { const lv = matLeaves(it); const sd = lv.filter(id => chk[id]).length; const full = sd === lv.length; return `
+      <div class="rounded-lg border ${full ? 'border-secondary/40 bg-secondary-fixed/20' : 'border-outline-variant bg-surface-container-low/30'} px-3.5 py-3">
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <div class="font-bold text-[13.5px]">${U.esc(it.label)}</div>
+          <span class="chip border ${full ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-on-surface-variant border-outline-variant'}">${sd}/${lv.length}</span>
+        </div>
+        <div class="divide-y divide-outline-variant/60">${it.steps.map(s => stepRow(it.id + '-' + s.id, s.label, s.by)).join('')}</div>
+      </div>`; };
     document.getElementById('mat-board').innerHTML = `
     <section class="card p-5 mb-6">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
         <h2 class="font-bold text-[16px] flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[20px]">inventory</span>자료 준비 체크리스트 <span class="text-on-surface-variant font-normal text-[13px]">매주 나가는 자료 점검 · 조교 공용</span></h2>
         <span class="chip border ${done === total ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-on-surface-variant border-outline-variant'}">${done}/${total} 완료</span>
       </div>
-      <div class="h-1.5 rounded-full bg-surface-container-low overflow-hidden mb-4"><div class="h-full rounded-full bg-secondary transition-all" style="width:${done / total * 100}%"></div></div>
+      <div class="h-1.5 rounded-full bg-surface-container-low overflow-hidden mb-4"><div class="h-full rounded-full bg-secondary transition-all" style="width:${total ? done / total * 100 : 0}%"></div></div>
       <div class="space-y-3.5">
-        ${MATERIALS.map(g => { const gd = g.items.filter(it => chk[it.id]).length; return `<div>
-          <div class="flex items-center gap-1.5 text-[13px] font-bold mb-2"><span class="material-symbols-outlined text-secondary text-[18px]">${g.icon}</span>${U.esc(g.group)} <span class="text-on-surface-variant font-normal">${gd}/${g.items.length}</span></div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">${g.items.map(cell).join('')}</div>
+        ${MATERIALS.map(g => { const lv = g.items.flatMap(matLeaves); const gd = lv.filter(id => chk[id]).length; const hasSteps = g.items.some(it => it.steps); return `<div>
+          <div class="flex items-center gap-1.5 text-[13px] font-bold mb-2"><span class="material-symbols-outlined text-secondary text-[18px]">${g.icon}</span>${U.esc(g.group)} <span class="text-on-surface-variant font-normal">${gd}/${lv.length}</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-start">${g.items.map(it => it.steps ? stepCard(it) : cell(it)).join('')}</div>
         </div>`; }).join('')}
       </div>
       <p class="text-on-surface-variant text-[11px] mt-3">체크는 <b>모든 조교가 공유</b>합니다(서버 저장). 매주 <b>일요일 22시</b>에 자동으로 새로 시작됩니다.</p>
