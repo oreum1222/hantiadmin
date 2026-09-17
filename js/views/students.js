@@ -18,7 +18,7 @@ Views.students = function (el) {
       <input id="st-search" class="fld !pl-10" placeholder="이름·학교·번호로 검색 (학생/학부모)"/>
     </div>
     <select id="st-status" class="fld !w-auto">
-      <option value="">전체 상태</option><option>재원</option><option>휴원</option>
+      <option value="">전체 상태</option><option>재원</option><option>휴원</option><option>퇴원</option>
     </select>
   </div>
 
@@ -35,7 +35,7 @@ Views.students = function (el) {
       <td class="text-on-surface-variant text-[13px]">${U.esc(s.school)} ${U.esc(s.grade)}</td>
       <td>${abs ? `<span class="text-red-400 font-bold">${abs}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
       <td>${mk ? `<span class="text-yellow-500 font-bold">${mk}</span>` : '<span class="text-on-surface-variant">0</span>'}</td>
-      <td>${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}</td>
+      <td>${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : s.status === '퇴원' ? '<span class="chip border text-red-400 border-red-400/30 bg-red-400/10">퇴원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}</td>
     </tr>`;
   };
   const groupHTML = (id, title, sub, list, open) => `
@@ -80,7 +80,8 @@ Views.students = function (el) {
 
     // 어느 강좌에도 등록되지 않은 학생
     const enrolledIds = new Set(App.db.enrollments.map(e => e.studentId));
-    const unassigned = base.filter(s => !enrolledIds.has(s.id));
+    // 강좌 미배정: 기본 화면에선 재원만 표시(휴원·퇴원은 숨김). 검색·상태필터 중엔 그대로 노출.
+    const unassigned = base.filter(s => !enrolledIds.has(s.id) && (searching || s.status === '재원'));
     if (unassigned.length) html += groupHTML('__none', '강좌 미배정', '', unassigned, searching ? true : Views._stOpen.has('__none'));
 
     // 종강 반은 토글 안으로
@@ -116,7 +117,7 @@ function renderStudent(el, studentId) {
     <div>
       <div class="flex items-center gap-2">
         <h1 class="text-2xl font-extrabold tracking-tight">${U.esc(s.name)}</h1>
-        ${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}
+        ${s.status === '재원' ? '<span class="chip border text-secondary border-secondary/30 bg-secondary-fixed/50">재원</span>' : s.status === '퇴원' ? '<span class="chip border text-red-400 border-red-400/30 bg-red-400/10">퇴원</span>' : '<span class="chip border text-on-surface-variant border-outline-variant">휴원</span>'}
       </div>
       <p class="text-on-surface-variant text-[14px] mt-1">${U.esc(s.school)} ${U.esc(s.grade)} · 학생 ${U.esc(s.phone || '—')} · 학부모 ${U.esc(s.parentPhone || '—')}</p>
       ${s.note ? `<p class="text-[13px] mt-2 bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 inline-block"><span class="material-symbols-outlined text-[14px] text-yellow-500 align-middle mr-1">sticky_note_2</span>${U.esc(s.note)}</p>` : ''}
@@ -341,7 +342,7 @@ Views._studentForm = function (studentId) {
     <h3 class="font-extrabold text-lg mb-4">${studentId ? '학생 정보 수정' : '학생 추가'}</h3>
     <div class="grid grid-cols-2 gap-3">
       <div><label class="lbl">이름 *</label><input id="stf-name" class="fld" value="${U.esc(s.name)}"/></div>
-      <div><label class="lbl">상태</label><select id="stf-status" class="fld">${['재원', '휴원'].map(x => `<option ${s.status === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+      <div><label class="lbl">상태</label><select id="stf-status" class="fld">${['재원', '휴원', '퇴원'].map(x => `<option ${s.status === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
       <div><label class="lbl">학교</label><input id="stf-school" class="fld" value="${U.esc(s.school)}"/></div>
       <div><label class="lbl">학년</label><input id="stf-grade" class="fld" value="${U.esc(s.grade)}" placeholder="고1"/></div>
       <div><label class="lbl">학생 연락처</label><input id="stf-phone" class="fld" value="${U.esc(s.phone)}" placeholder="010-"/></div>
