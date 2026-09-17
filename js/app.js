@@ -81,14 +81,18 @@ window.App = {
   // 강좌 → 발신 구분('hanti'|'oreum') 및 표시 번호
   senderKeyOf(courseId) { return (CONFIG.MEXX_COURSES || []).includes(courseId) ? 'hanti' : 'oreum'; },
   senderNumberOf(key) { return key === 'oreum' ? CONFIG.SENDER_OREUM : CONFIG.SENDER_HANTI; },
-  // Solapi 릴레이(hwsys)로 발송. dryRun=true면 실발송 없이 형식·대상만 확인.
-  async sendSMS(messages, dryRun) {
-    const res = await fetch(CONFIG.SEND_URL, {
+  // 과제 검사(hwsys) 호출은 허브 서버 중계로만 한다(PIN 확인 후 서버가 API 키로 호출, 2026-09-18 보안 수정)
+  async hwCall(hwAction, params) {
+    const res = await fetch(CONFIG.SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
-      body: new URLSearchParams({ action: 'sendMessages', dryRun: dryRun ? '1' : '0', messages: JSON.stringify(messages) }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ pin: App.pin, action: 'hwRelay', payload: { hwAction, params: params || {} } }),
     });
     return res.json();
+  },
+  // Solapi 릴레이(hwsys)로 발송. dryRun=true면 실발송 없이 형식·대상만 확인.
+  async sendSMS(messages, dryRun) {
+    return App.hwCall('sendMessages', { dryRun: dryRun ? '1' : '0', messages: JSON.stringify(messages) });
   },
   // 문자 바이트 수(한글 2, 그 외 1) 및 SMS/LMS 판별
   smsBytes(text) { let b = 0; for (const ch of String(text || '')) b += ch.charCodeAt(0) > 127 ? 2 : 1; return b; },
@@ -128,15 +132,15 @@ window.App = {
   // 과제 검사 시스템 등록 명단 (courseId 기준, 헤더행 제외) — 54KB
   hwRoster() {
     if (!window.__HW_ROSTER) {
-      window.__HW_ROSTER = fetch(CONFIG.SEND_URL + '?action=roster').then(r => r.json())
-        .then(rows => (rows || []).filter(x => x.courseId && x.courseId !== 'courseId')).catch(() => []);
+      window.__HW_ROSTER = App.hwCall('roster')
+        .then(rows => (Array.isArray(rows) ? rows : []).filter(x => x.courseId && x.courseId !== 'courseId')).catch(() => []);
     }
     return window.__HW_ROSTER;
   },
   // 미완료(독려 대상) 큐 — 28KB
   hwPending() {
     if (!window.__HW_PENDING) {
-      window.__HW_PENDING = fetch(CONFIG.SEND_URL + '?action=pending').then(r => r.json())
+      window.__HW_PENDING = App.hwCall('pending')
         .then(rows => Array.isArray(rows) ? rows.filter(x => x && x.name && x.name !== '실험용' && x.name !== '[실험용]') : []).catch(() => []);
     }
     return window.__HW_PENDING;
@@ -144,7 +148,7 @@ window.App = {
   // 과제 검사 제출 결과(완수율·정답률·틀린문항·오답상세·코멘트) — 대용량 list(≈6MB) 1회 로드·캐시
   hwSubmissions() {
     if (!window.__HW_LIST) {
-      window.__HW_LIST = fetch(CONFIG.SEND_URL + '?action=list').then(r => r.json())
+      window.__HW_LIST = App.hwCall('list')
         .then(d => { const rows = Array.isArray(d) ? d : (d && d.rows) || []; return rows.filter(x => x && x.name && String(x.name).indexOf('실험용') < 0 && String(x.name).indexOf('테스트') < 0); })
         .catch(() => []);
     }
