@@ -33,6 +33,17 @@ window.App = {
   },
   coursesOf(studentId) { return App.db.enrollments.filter(e => e.studentId === studentId).map(e => App.courseOf(e.courseId)).filter(Boolean); },
   attOf(sessionId) { return App.db.attendance.filter(a => a.sessionId === sessionId); },
+  // 회차 출결 요약: 출석(보강 처리=출석 인정 포함) / 총원(기록된 인원). issue = 미연락(보강 미처리) 결석만.
+  attSummary(sessionId) {
+    const recs = App.attOf(sessionId);
+    const mk = {}; App.db.makeups.forEach(m => { if (m.sessionId === sessionId) mk[m.studentId] = m; });
+    let present = 0;
+    recs.forEach(r => {
+      if (['출석', '지각', '온라인', '보강'].includes(r.status)) present++;
+      else if (r.status === '결석') { const m = mk[r.studentId]; if (m && m.status && m.status !== '필요') present++; } // 보강 신청/전달/완료 → 출석 인정
+    });
+    return { present, total: recs.length, issue: recs.length - present };
+  },
   // 후발 등록 학생의 수강 시작일 (이 날짜 이전 회차는 '수강 전')
   enrollStart(studentId) { return (window.ENROLL_START || {})[studentId] || ''; },
   // 학생의 수강 시작 회차 번호(해당 강좌에서 시작일 이후 첫 비영상 회차)
