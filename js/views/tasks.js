@@ -27,6 +27,11 @@ Views.tasks = function (el) {
       { id: 'mat-hy-1', label: '내신형 문항 모음 워크북' },
       { id: 'mat-hy-2', label: '전주차 해설지 자료' },
       { id: 'mat-hy-3', label: '전주차 오답률 자료' },
+      { id: 'mat-hy-4', label: '학교별 유인물 자료', steps: [
+        { id: 'a', label: '제작 초안', by: '가경T' },
+        { id: 'b', label: '최종 편집', by: '조교' },
+        { id: 'c', label: '이번 주 없음', by: '' },
+      ] },
     ] },
     { group: '수능 국어', icon: 'menu_book', items: [
       { id: 'mat-su-1', label: '교재', steps: [
