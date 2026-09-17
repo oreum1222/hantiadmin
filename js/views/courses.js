@@ -71,13 +71,14 @@ function renderDetail(el, courseId) {
         <thead><tr><th class="w-12">회차</th><th class="w-24">날짜</th><th>진도</th><th class="w-20">출결</th><th class="w-16"></th></tr></thead>
         <tbody>${sessions.map(s => {
           const recs = App.attOf(s.id);
+          const sum = App.attSummary(s.id);
           const isPast = s.date && s.date <= U.today();
           const hasMemo = !!(s.memo && String(s.memo).trim());
           return `<tr class="${hasMemo ? '!border-b-0' : ''}">
             <td class="font-bold">${s.isVideo ? '<span class="material-symbols-outlined text-[18px] text-purple-400">smart_display</span>' : s.no}</td>
             <td class="${isPast ? '' : 'text-on-surface-variant'}">${U.fmtD(s.date)}</td>
             <td class="text-[13px]">${U.esc(s.topic)}</td>
-            <td>${s.isVideo ? '<span class="text-on-surface-variant text-[12px]">—</span>' : recs.length ? `<button class="text-secondary text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">${recs.length}명 ✓</button>` : isPast ? `<button class="text-yellow-500 text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">미체크</button>` : '<span class="text-on-surface-variant text-[12px]">예정</span>'}</td>
+            <td>${s.isVideo ? '<span class="text-on-surface-variant text-[12px]">—</span>' : recs.length ? `<button class="${sum.issue ? 'text-yellow-500' : 'text-secondary'} text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'" title="${sum.issue ? '미연락 결석 ' + sum.issue + '명 (보강 미처리)' : '전원 출석·보강 처리 완료'}">${sum.present}/${sum.total}${sum.issue ? ` · 미연락 ${sum.issue}` : ' ✓'}</button>` : isPast ? `<button class="text-yellow-500 text-[13px] font-bold hover:underline" onclick="location.hash='#attendance/${c.id}/${s.id}'">미체크</button>` : '<span class="text-on-surface-variant text-[12px]">예정</span>'}</td>
             <td class="whitespace-nowrap">
               <button class="${hasMemo ? 'text-secondary' : 'text-on-surface-variant'} hover:text-secondary align-middle" onclick="Views._sessionMemo('${c.id}','${s.id}')" title="${hasMemo ? '숙제·메모 보기·추가' : '숙제·메모 추가'}"><span class="material-symbols-outlined text-[18px]">assignment</span></button>
               <button class="text-on-surface-variant hover:text-on-surface align-middle ml-1" onclick="Views._sessionForm('${c.id}','${s.id}')" title="회차 수정"><span class="material-symbols-outlined text-[18px]">edit</span></button>
