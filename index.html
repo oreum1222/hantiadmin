@@ -11,13 +11,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="운영 허브"/>
+<meta name="apple-mobile-web-app-title" content="MEXX 가경T"/>
 <script>(function(){try{var t=localStorage.getItem('mexx-theme'),d=document.documentElement;if(t==='light'){d.classList.remove('dark');d.classList.add('light');var m=document.querySelector('meta[name=theme-color]');if(m)m.content='#f6f8fc';}else{d.classList.add('dark');}}catch(e){}})();</script>
-<title>운영 허브 | 김가경 국어 · 한티 MEXX</title>
+<title>MEXX 가경T | 김가경 국어 · 한티 MEXX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet"/>
 <script id="tailwind-config">
   tailwind.config = { darkMode:"class", theme:{ extend:{
     "colors":{ "background":"rgb(var(--c-background) / <alpha-value>)","surface-bright":"rgb(var(--c-surface-bright) / <alpha-value>)","surface":"rgb(var(--c-surface) / <alpha-value>)","surface-container-lowest":"rgb(var(--c-surface-container-lowest) / <alpha-value>)","surface-container-low":"rgb(var(--c-surface-container-low) / <alpha-value>)","surface-container":"rgb(var(--c-surface-container) / <alpha-value>)","surface-container-high":"rgb(var(--c-surface-container-high) / <alpha-value>)","surface-container-highest":"rgb(var(--c-surface-container-highest) / <alpha-value>)","outline-variant":"rgb(var(--c-outline-variant) / <alpha-value>)","outline":"rgb(var(--c-outline) / <alpha-value>)","on-surface":"rgb(var(--c-on-surface) / <alpha-value>)","on-surface-variant":"rgb(var(--c-on-surface-variant) / <alpha-value>)","secondary":"rgb(var(--c-secondary) / <alpha-value>)","on-secondary":"rgb(var(--c-on-secondary) / <alpha-value>)","secondary-fixed":"rgb(var(--c-secondary-fixed) / <alpha-value>)" },
@@ -32,7 +34,7 @@
 <div id="pin-gate" class="fixed inset-0 z-[100] bg-background flex items-center justify-center p-6 hidden">
   <div class="w-full max-w-sm bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 text-center">
     <img src="mexx-symbol.png" class="w-12 h-12 rounded-xl mx-auto mb-4" alt=""/>
-    <h1 class="text-xl font-extrabold tracking-tight">김가경 <span class="text-secondary">국어</span> 운영 허브</h1>
+    <h1 class="text-xl font-extrabold tracking-tight">MEXX 김가경 <span class="text-secondary">국어</span> 연구소</h1>
     <p class="text-on-surface-variant text-[13px] mt-1.5 mb-6">관리자 전용 페이지입니다. PIN을 입력하세요.</p>
     <input id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="8"
       class="w-full text-center text-2xl tracking-[0.5em] bg-surface-container-low border border-outline-variant rounded-xl py-3 focus:border-secondary focus:ring-secondary"
@@ -51,7 +53,7 @@
       <img class="w-7 h-7 rounded-md" src="mexx-symbol.png" alt="한티 MEXX"/>
       <div class="leading-tight">
         <div class="font-extrabold tracking-tight">김가경 <span class="text-secondary">국어</span></div>
-        <div class="text-[11px] text-on-surface-variant">한티 MEXX 운영 허브</div>
+        <div class="text-[11px] text-on-surface-variant">MEXX 가경T</div>
       </div>
     </div>
     <nav id="side-nav" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto"></nav>
@@ -71,7 +73,7 @@
   <div class="flex-1 min-w-0 flex flex-col">
     <!-- 모바일 헤더 -->
     <header class="md:hidden sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-outline-variant flex items-center justify-between h-14 px-4">
-      <div class="flex items-center gap-2"><img class="w-6 h-6 rounded" src="mexx-symbol.png" alt=""/><span class="font-extrabold text-[15px]">운영 허브</span></div>
+      <div class="flex items-center gap-2"><img class="w-6 h-6 rounded" src="mexx-symbol.png" alt=""/><span class="font-extrabold text-[15px]">MEXX 가경T</span></div>
       <div class="flex gap-1">
         <button id="theme-toggle-m" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button>
         <button id="logout-btn-m" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">lock</span></button>
