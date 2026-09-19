@@ -104,6 +104,8 @@ Views.tasks = function (el) {
     </div>
   </div>
 
+  <div id="push-card" class="card p-4 mb-6"></div>
+
   <section class="card p-5 mb-6 border-2 border-amber-500/40 bg-amber-500/5">
     <h2 class="font-bold text-[16px] flex items-center gap-2 mb-2.5 text-amber-500"><span class="material-symbols-outlined text-[20px]">campaign</span>신규생 있을 시 필독</h2>
     <ol class="space-y-2 text-[13.5px] pl-0.5">
@@ -315,6 +317,9 @@ Views.tasks = function (el) {
     }));
   }
   drawWeek();
+
+  // ── 푸시 알림 카드 (이 기기에서 켜기/끄기) ──
+  if (window.Push) Push.drawCard();
 
   // ── 수시 업무 (DB 연동) ──
   function dday(due) {
