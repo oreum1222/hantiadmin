@@ -4,6 +4,9 @@ window.CONFIG = {
   // Apps Script 웹앱 URL. 비어 있으면 데모 모드(localStorage)로 동작.
   SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzNg79BjvaVqXZF6LFKIGsH1sOqIjQETgGbB62L6xn6WR5AfcJ0D_xxZ2HO-g5JzSbKBg/exec',
 
+  // 웹 푸시(VAPID) 공개키. 비밀키는 발송 PC의 C:\Users\Public\.secrets\vapid_private.pem 에만 존재(저장소엔 없음).
+  VAPID_PUBLIC_KEY: 'BCOOt91f2tjHYcXb0hbFPCPlojXPbOexjQ0kVr9E_mVKOezO0mfKp_1i0L_7qWx070VHGcw1sVpemr9qP1Sm-3M',
+
   // 학습 성향 진단(fassessment) 연동 — 라이브 모드에선 백엔드가 릴레이(키 불필요)
   FASSESSMENT_URL: 'https://script.google.com/macros/s/AKfycby9qU_19oS8xDijJJttVEf5MChRvNW4oLpMlGejsGaSOUp55mJkeQG_sdBmhczitR_B/exec',
   FASSESSMENT_KEY: '',  // ⚠️ 공개 저장소이므로 키를 여기 두지 말 것 (백엔드 릴레이 사용)
