@@ -253,7 +253,19 @@ window.App = {
       ? `<a class="bottom-nav-item" href="${m.url}" target="_blank" rel="noopener"><span class="material-symbols-outlined text-[22px]">${m.icon}</span>${m.label}</a>`
       : `<div class="bottom-nav-item" data-view="${m.id}"><span class="material-symbols-outlined text-[22px]">${m.icon}</span>${m.label}</div>`).join('');
   bottomNav.style.gridTemplateColumns = `repeat(${App.MENUS.length}, minmax(0, 1fr))`; // 메뉴 수에 맞춰 열 수 자동 조정
-  document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => App.navigate(el.dataset.view)));
+  // ── 모바일 사이드바 서랍 ──
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('drawer-backdrop');
+  function openDrawer() { sidebar.classList.add('open'); backdrop.classList.remove('hidden'); }
+  function closeDrawer() { sidebar.classList.remove('open'); backdrop.classList.add('hidden'); }
+  document.getElementById('nav-toggle')?.addEventListener('click', openDrawer);
+  backdrop?.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+  App.closeDrawer = closeDrawer;
+
+  document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => { App.navigate(el.dataset.view); App.closeDrawer && App.closeDrawer(); }));
+  // 서랍 안의 외부 링크(복습시험 등) 클릭 시에도 닫기
+  document.querySelectorAll('#side-nav a').forEach(a => a.addEventListener('click', () => App.closeDrawer && App.closeDrawer()));
 
   // 테마 토글
   function toggleTheme() {

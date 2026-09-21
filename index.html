@@ -46,7 +46,7 @@
 <div id="app-shell" class="hidden min-h-screen md:flex">
 
   <!-- 사이드바 (데스크톱) -->
-  <aside class="hidden md:flex flex-col w-60 shrink-0 h-screen sticky top-0 bg-surface-bright border-r border-outline-variant">
+  <aside id="sidebar" class="hidden md:flex flex-col w-60 shrink-0 h-screen sticky top-0 bg-surface-bright border-r border-outline-variant">
     <div class="flex items-center gap-2.5 px-5 h-16 border-b border-outline-variant">
       <img class="w-7 h-7 rounded-md" src="mexx-symbol.png" alt="한티 MEXX"/>
       <div class="leading-tight">
@@ -70,19 +70,24 @@
   <!-- 본문 -->
   <div class="flex-1 min-w-0 flex flex-col">
     <!-- 모바일 헤더 -->
-    <header class="md:hidden sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-outline-variant flex items-center justify-between h-14 px-4">
-      <div class="flex items-center gap-2"><img class="w-6 h-6 rounded" src="mexx-symbol.png" alt=""/><span class="font-extrabold text-[15px]">MEXX 가경T</span></div>
-      <div class="flex gap-1">
+    <header class="md:hidden sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-outline-variant flex items-center justify-between h-14 px-3">
+      <div class="flex items-center gap-1.5 min-w-0">
+        <button id="nav-toggle" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container shrink-0" aria-label="메뉴"><span class="material-symbols-outlined text-[22px]">menu</span></button>
+        <img class="w-6 h-6 rounded shrink-0" src="mexx-symbol.png" alt=""/><span class="font-extrabold text-[15px] truncate">MEXX 가경T</span>
+      </div>
+      <div class="flex gap-1 shrink-0">
         <button id="theme-toggle-m" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button>
         <button id="logout-btn-m" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">lock</span></button>
       </div>
     </header>
 
-    <main id="view" class="flex-1 px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-10 max-w-[1200px] w-full mx-auto"></main>
+    <main id="view" class="flex-1 px-3 md:px-8 py-4 md:py-8 pb-10 max-w-[1200px] w-full mx-auto"></main>
   </div>
 
-  <!-- 하단 탭바 (모바일) -->
-  <nav id="bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-bright/95 backdrop-blur border-t border-outline-variant grid grid-cols-8"></nav>
+  <!-- 모바일 사이드바 서랍 배경 -->
+  <div id="drawer-backdrop" class="hidden md:hidden fixed inset-0 z-[70] bg-black/50 backdrop-blur-[1px]"></div>
+  <!-- 하단 탭바(모바일)는 사이드바 서랍으로 대체 — 미사용 -->
+  <nav id="bottom-nav" class="hidden"></nav>
 </div>
 
 <!-- 토스트 -->
