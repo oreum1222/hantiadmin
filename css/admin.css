@@ -21,7 +21,7 @@ html.light {
 @font-face{
   font-family:'Material Symbols Outlined';
   font-style:normal;font-weight:100 700;font-display:block;
-  src:url('../fonts/material-symbols-subset.woff2') format('woff2');
+  src:url('../fonts/material-symbols-subset-v2.woff2') format('woff2');
 }
 .material-symbols-outlined{
   font-family:'Material Symbols Outlined';
@@ -93,3 +93,25 @@ html.light .nav-item.active{background:rgb(var(--c-secondary-fixed));color:rgb(v
 /* 뷰 페이드인 */
 .view-fade{animation:view-in .3s cubic-bezier(.22,1,.36,1);}
 @keyframes view-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* 넓은 표는 가로 스크롤 래퍼로 감싼다(모바일에서 페이지가 밀리지 않게) */
+.tbl-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ── 모바일: PC 느낌(전체 메뉴 사이드바 서랍 + 정보 밀도 상향) ── */
+@media (max-width:767px){
+  /* 데스크톱 사이드바를 그대로 슬라이드 서랍으로 재사용 */
+  #sidebar{
+    display:flex !important;                 /* Tailwind .hidden 무력화 */
+    position:fixed; z-index:80; left:0; top:0;
+    height:100vh; height:100dvh; width:15.5rem;
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.22,1,.36,1);
+    box-shadow:0 0 40px rgba(0,0,0,.5);
+  }
+  #sidebar.open{transform:translateX(0);}
+  /* 밀도 상향 */
+  .card{border-radius:.85rem;}
+  .tbl th{padding:.4rem .55rem;font-size:11.5px;}
+  .tbl td{padding:.5rem .55rem;font-size:13px;}
+  .tbl{white-space:nowrap;}
+}
