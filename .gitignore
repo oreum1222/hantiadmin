@@ -12,3 +12,9 @@ docs/문자-템플릿.md
 
 # 반명단 붙여넣기 원본(학생 개인정보) — 저장소 제외
 반명단_*.txt
+
+# 학생 개인정보(2026-09-27 유출 사고 후): 실데이터는 비공개 GAS(Snapshots.js)와 시트에만
+js/*-data.js
+js/enroll-start.js
+*.csv
+*.xlsx

@@ -279,6 +279,21 @@ window.App = {
   function lock() { sessionStorage.removeItem('hanti-admin-auth'); location.reload(); }
   ['logout-btn', 'logout-btn-m'].forEach(id => document.getElementById(id)?.addEventListener('click', lock));
 
+  // 학생 데이터 스냅샷은 공개 파일로 두지 않고 PIN 인증 후 서버(action=snapshots)에서만 받는다(2026-09-27).
+  // 실패해도 대시보드는 열리고 해당 칸만 빈다.
+  async function loadSnapshots(pin) {
+    if (Api.isDemo()) return;
+    try {
+      const res = await fetch(CONFIG.SCRIPT_URL + '?pin=' + encodeURIComponent(pin) + '&action=snapshots&t=' + Date.now(), { cache: 'no-store' });
+      const s = ((await res.json()) || {}).snapshots || {};
+      window.ADMISSIONS = s.admissions || {};
+      window.ADMISSIONS_FINAL = s.admissionsFinal || {};
+      window.REVIEW = s.review || {};
+      window.ENROLL_START = s.enrollStart || {};
+      window.FA_SNAPSHOT = s.fa || [];
+    } catch (e) { console.warn('스냅샷 로드 실패', e); }
+  }
+
   async function enter(role, pin) {
     App.role = role; App.pin = pin;
     sessionStorage.setItem('hanti-admin-auth', JSON.stringify({ role, pin }));
@@ -286,7 +301,7 @@ window.App = {
       `<span class="material-symbols-outlined text-[14px]">${role === 'master' ? 'workspace_premium' : 'badge'}</span>${role === 'master' ? '가경T (마스터)' : '스태프'}`;
     document.getElementById('mode-badge').textContent = Api.isDemo() ? '데모 모드 · 이 기기에만 저장됩니다' : '라이브 · Google Sheets 연동';
     try {
-      App.db = await Api.load(pin);
+      [App.db] = await Promise.all([Api.load(pin), loadSnapshots(pin)]);
     } catch (e) {
       gate.classList.remove('hidden'); shell.classList.add('hidden');
       errEl.textContent = '데이터 로드 실패: ' + e.message;
