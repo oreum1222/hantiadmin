@@ -45,6 +45,27 @@ Views.courses = function (el) {
 };
 
 // ── 강좌 상세 ──
+// 회차 메모: 맨 앞 자유 메모는 그대로 보이고, `── 제목 ──` 줄로 시작하는 구간(숙제 검사·카톡 이슈)은 접힌 토글로 보인다
+function memoBox(cid, sid, memo) {
+  const parts = String(memo).split(/^── (.+?) ──$/m);   // [앞 메모, 제목1, 본문1, 제목2, 본문2, ...]
+  const head = parts[0].trim();
+  const chip = `<span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 mr-1.5 !text-[10.5px] !py-0 !px-1.5 align-middle">숙제·메모</span>`;
+  const secs = [];
+  for (let i = 1; i < parts.length; i += 2) {
+    const title = parts[i], body = (parts[i + 1] || '').trim();
+    const stu = (body.match(/^• /gm) || []).length;
+    const open = (body.match(/^\[미해결 (\d+)\]/m) || [])[1];
+    const info = stu ? `학생 ${stu}명` : open ? `미해결 ${open}` : '';
+    secs.push(`<details class="group mt-1.5 border-t border-outline-variant/60 pt-1.5" onclick="event.stopPropagation()">
+      <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none flex items-center gap-1.5 font-bold text-on-surface hover:text-secondary">
+        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-open:rotate-180">expand_more</span>${U.esc(title)}${info ? `<span class="font-normal text-on-surface-variant text-[11.5px]">${info}</span>` : ''}
+      </summary>
+      <div class="whitespace-pre-wrap mt-1.5">${U.esc(body)}</div>
+    </details>`);
+  }
+  return `<div class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-[12.5px] text-on-surface-variant leading-relaxed row-click" onclick="Views._sessionMemo('${cid}','${sid}')">${chip}${head ? `<span class="whitespace-pre-wrap">${U.esc(head)}</span>` : ''}${secs.join('')}</div>`;
+}
+
 function renderDetail(el, courseId) {
   const c = App.courseOf(courseId);
   if (!c) { location.hash = '#courses'; return; }
@@ -90,7 +111,7 @@ function renderDetail(el, courseId) {
             </td>
           </tr>
           ${hasMemo ? `<tr><td colspan="5" class="!pt-0">
-            <div class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-[12.5px] text-on-surface-variant leading-relaxed whitespace-pre-wrap row-click" onclick="Views._sessionMemo('${c.id}','${s.id}')"><span class="chip border border-secondary/30 text-secondary bg-secondary-fixed/40 mr-1.5 !text-[10.5px] !py-0 !px-1.5 align-middle">숙제·메모</span>${U.esc(s.memo)}</div>
+            ${memoBox(c.id, s.id, s.memo)}
           </td></tr>` : ''}`;
         }).join('')}</tbody>
       </table></div>
