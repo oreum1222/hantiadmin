@@ -14,6 +14,7 @@ Views.courses = function (el) {
           <div>
             <span class="chip border ${c.kind === '단과' ? 'text-secondary border-secondary/30 bg-secondary-fixed/50' : 'text-blue-400 border-blue-400/30 bg-blue-400/10'}">${U.esc(c.kind)}</span>
             ${ended ? '<span class="chip border border-outline-variant text-on-surface-variant ml-1">종강</span>' : ''}
+            ${window.Issues && Issues.openCount(c.id) ? `<span class="chip border text-amber-500 border-amber-500/30 bg-amber-500/10 ml-1">이슈 ${Issues.openCount(c.id)}</span>` : ''}
             <h3 class="font-bold text-[16px] mt-2">${U.esc(c.name)}</h3>
           </div>
           <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
@@ -37,8 +38,10 @@ Views.courses = function (el) {
     </div>
     <button class="btn btn-primary" onclick="Views._courseForm()"><span class="material-symbols-outlined text-[18px]">add</span>강좌 추가</button>
   </div>
-  <div class="grid md:grid-cols-2 gap-4">${active.length ? active.map(card).join('') : '<p class="text-on-surface-variant text-[13px]">진행 중인 강좌가 없습니다.</p>'}</div>
+  <div class="grid md:grid-cols-2 gap-4 mb-6">${active.length ? active.map(card).join('') : '<p class="text-on-surface-variant text-[13px]">진행 중인 강좌가 없습니다.</p>'}</div>
+  ${window.Issues ? Issues.slot('common', '공통 운영 이슈', '조교 단톡에서 나온 강좌 공통 사항입니다. 강좌별 이슈는 각 강좌를 누르면 맨 위에 있습니다.') : ''}
   ${ended.length ? App.endedBox(ended.length, `<div class="grid md:grid-cols-2 gap-4">${ended.map(card).join('')}</div>`) : ''}`;
+  if (window.Issues) Issues.draw('common');
 };
 
 // ── 강좌 상세 ──
@@ -59,6 +62,8 @@ function renderDetail(el, courseId) {
     </div>
     <button class="btn btn-ghost" onclick="Views._courseForm('${c.id}')"><span class="material-symbols-outlined text-[18px]">edit</span>정보 수정</button>
   </div>
+
+  ${window.Issues ? Issues.slot(c.id, '카톡 이슈 정리', '조교 단톡에서 나온 이 강좌의 문제, 대기 업무, 운영 규칙입니다. 해결되면 체크하세요.') : ''}
 
   <div class="grid lg:grid-cols-5 gap-4">
     <!-- 회차 -->
@@ -116,6 +121,7 @@ function renderDetail(el, courseId) {
       <div id="hw-assign-list"><p class="text-on-surface-variant text-[13px] py-1">불러오는 중…</p></div>
     </section>` : ''}
   </div>`;
+  if (window.Issues) Issues.draw(c.id);
 
   // 과제(숙제) 라이브 연동 채우기 (과제 검사 시스템에서 주차별 과제 범위)
   if (CONFIG.HW_COURSE_MAP[c.id]) {
