@@ -1,6 +1,16 @@
 // ═══ 조교 확인 (운영진 업무 체크리스트) ═══
 // 상단: 매주 일요일 정기 루틴(수업 전/중/후) · 하단: 수시 업무(가경T 등록, 조교 완료 체크)
 Views.tasks = function (el) {
+  // ── 상단 탭: 업무 체크 / 폰트 아카이브 (#tasks · #tasks/fonts) ──
+  const tab = (location.hash.split('/')[1] === 'fonts') ? 'fonts' : 'work';
+  const tabBar = `
+  <div class="flex gap-1 p-1 mb-6 rounded-xl bg-surface-container-low w-fit">
+    ${[['work', '업무 체크', 'checklist', '#tasks'], ['fonts', '폰트 아카이브', 'edit_note', '#tasks/fonts']].map(([id, label, ic, href]) => `
+    <a href="${href}" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[14px] font-bold transition-colors ${tab === id ? 'bg-secondary text-on-secondary' : 'text-on-surface-variant hover:text-on-surface'}">
+      <span class="material-symbols-outlined text-[18px]">${ic}</span>${label}</a>`).join('')}
+  </div>`;
+  if (tab === 'fonts') return Views._fontArchive(el, tabBar);
+
   const worker = localStorage.getItem('hanti-admin-worker') || CONFIG.STAFF[1] || '실장';
   App.db.tasks || (App.db.tasks = []);
 
@@ -85,6 +95,7 @@ Views.tasks = function (el) {
       <button class="btn btn-primary" onclick="Views._taskForm()"><span class="material-symbols-outlined text-[18px]">add_task</span>수시 업무 추가</button>
     </div>
   </div>
+  ${tabBar}
 
   <div id="push-card" class="card p-4 mb-6"></div>
 
@@ -298,6 +309,65 @@ Views.tasks = function (el) {
     }));
   }
   ['tk-assignee', 'tk-showdone'].forEach(id => document.getElementById(id).addEventListener('input', draw));
+  draw();
+};
+
+// ── 폰트 아카이브 탭: 폰트 이름 누르면 그 폰트가 담긴 캡처를 모달로 ──
+Views._fontArchive = function (el, tabBar) {
+  const list = window.FONT_ARCHIVE || [];
+  const fonts = [...new Set(list.flatMap(it => it.fonts))].sort((a, b) => a.localeCompare(b, 'ko'));
+  el.innerHTML = `
+  <div class="mb-6">
+    <h1 class="text-2xl font-extrabold tracking-tight">조교 확인</h1>
+    <p class="text-on-surface-variant text-[14px] mt-1">폰트 아카이브 · 캡처 ${list.length}장 · 폰트 ${fonts.length}종. 폰트 이름을 누르면 그 폰트가 담긴 캡처가 뜹니다.</p>
+  </div>
+  ${tabBar}
+  <section class="card p-5 mb-6">
+    <input id="fa-q" class="fld mb-4" type="search" placeholder="폰트 이름·계정으로 찾기 (예: 명조, 눈누, dotcom)"/>
+    <div id="fa-chips" class="flex flex-wrap gap-2"></div>
+  </section>
+  <div id="fa-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>`;
+
+  const chipHTML = f => `<button class="fa-chip chip border border-outline-variant text-on-surface hover:border-secondary hover:text-secondary !text-[13px] !py-1.5 !px-3 cursor-pointer" data-f="${U.esc(f)}">${U.esc(f)}</button>`;
+  const cardHTML = (it, i) => `
+    <div class="card overflow-hidden flex flex-col">
+      <button class="fa-shot block bg-black aspect-[9/14] overflow-hidden" data-i="${i}"><img loading="lazy" src="${it.img}" alt="${U.esc(it.fonts.join(', '))} 캡처" class="w-full h-full object-cover object-top"/></button>
+      <div class="p-3">
+        <div class="flex flex-wrap gap-1 mb-1">${it.fonts.map(chipHTML).join('')}</div>
+        <p class="text-[12px] text-on-surface-variant leading-snug">${U.esc(it.note)}</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5">${it.date}</p>
+      </div>
+    </div>`;
+  function draw() {
+    const q = document.getElementById('fa-q').value.trim().toLowerCase();
+    const hit = it => !q || (it.fonts.join(' ') + ' ' + it.note).toLowerCase().includes(q);
+    document.getElementById('fa-chips').innerHTML = fonts.filter(f => !q || f.toLowerCase().includes(q) || list.some(it => it.fonts.includes(f) && hit(it))).map(chipHTML).join('');
+    const rows = list.map((it, i) => [it, i]).filter(([it]) => hit(it));
+    document.getElementById('fa-grid').innerHTML = rows.length ? rows.map(([it, i]) => cardHTML(it, i)).join('')
+      : '<div class="card p-10 text-center text-on-surface-variant text-[14px] col-span-full">찾는 폰트가 없습니다.</div>';
+  }
+  function show(title, items) {
+    const root = App.modal(`
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <h3 class="font-extrabold text-lg">${U.esc(title)} <span class="text-on-surface-variant font-normal text-[14px]">${items.length}장</span></h3>
+        <button class="btn btn-ghost !px-2" onclick="App.closeModal()" aria-label="닫기"><span class="text-[22px] leading-none">×</span></button>
+      </div>
+      <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+        ${items.map(it => `<figure class="m-0 shrink-0 snap-start w-[min(380px,78vw)]">
+          <img src="${it.img}" alt="${U.esc(title)} 캡처" class="w-full rounded-lg"/>
+          <figcaption class="text-[12px] text-on-surface-variant mt-1.5">${U.esc(it.fonts.join(' · '))}<br>${U.esc(it.note)} · ${it.date}</figcaption>
+        </figure>`).join('')}
+      </div>`);
+    const box = root.querySelector('.modal-box');
+    box.style.maxWidth = items.length > 1 ? '860px' : '440px';
+  }
+  el.addEventListener('click', e => {
+    const c = e.target.closest('.fa-chip');
+    if (c) return show(c.dataset.f, list.filter(it => it.fonts.includes(c.dataset.f)));
+    const s = e.target.closest('.fa-shot');
+    if (s) { const it = list[+s.dataset.i]; show(it.fonts.join(' · '), [it]); }
+  });
+  document.getElementById('fa-q').addEventListener('input', draw);
   draw();
 };
 
