@@ -295,19 +295,5 @@ window.FONT_ARCHIVE = [
    "캘리크라퍼 Crayon"
   ],
   "note": "dearmooee 감성 한글 폰트 소개 3/13"
- },
- {
-  "img": "font-archive/20251121_201455.jpg?v=3",
-  "date": "2025.11.21",
-  "fonts": [
-   "SamsungOne",
-   "굵은 고딕",
-   "Roboto",
-   "공스타(냥냥이연필)",
-   "작은시인",
-   "잔디위를둥둥",
-   "TS환상의나라"
-  ],
-  "note": "삼성 휴대폰 설정 › 글꼴 목록 화면"
  }
 ];
