@@ -265,6 +265,86 @@ window.FONT_ARCHIVE = [
   "note": "lilsucone 주인장이 실제로 쓰는 폰트 레시피 3/7"
  },
  {
+  "img": "font-archive/ig_DafOG_fEzYE_01.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAFn3APVfwc"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_02.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAF9sEOMW9E"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_03.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAGett2trJY"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_04.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAGfvkRvJUI"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_05.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAF_ZgGtsrY"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_06.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAGhnEJKmog"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_07.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAFTT7krXr4"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_08.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAFqp9jL_Vk"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_09.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAGb8OiXq6Q"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DafOG_fEzYE_10.jpg?v=3",
+  "date": "2026.07.07",
+  "fonts": [
+   "캔바 시크릿 set:nAGF1BNK6go"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 10종(요소 검색 코드)"
+ },
+ {
   "img": "font-archive/20260618_003146.jpg?v=3",
   "date": "2026.06.18",
   "fonts": [
@@ -289,11 +369,467 @@ window.FONT_ARCHIVE = [
   "note": "dotcom.mag 썸네일 속 폰트 파헤치기 2/8 · 산돌구름 유료"
  },
  {
+  "img": "font-archive/ig_DW0ySYeEyPL_01.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Ame Chon Pop Maru"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_02.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Blabeloo"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_03.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Adigiana"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_04.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Wedges"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_05.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Lazydog"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_06.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Kawaii RT Shine"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DW0ySYeEyPL_07.jpg?v=3",
+  "date": "2026.04.06",
+  "fonts": [
+   "Shepherd"
+  ],
+  "note": "misty2050 캔바 동글동글 영문 폰트 7종"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_02.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFoIRKAoD4"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_03.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAGEzzkmMgA"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_04.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFwT1P2oSE"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_05.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFrl-tJzgw"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_06.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFi_vUthdU"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_07.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFncq2Yl5Y"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWc1ef3k4Gy_08.jpg?v=3",
+  "date": "2026.03.28",
+  "fonts": [
+   "캔바 시크릿 set:nAFlxebJmPE"
+  ],
+  "note": "misty2050 캔바 스크랩북 스타일 시크릿 폰트(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWQwZhqE9kx_01.jpg?v=3",
+  "date": "2026.03.24",
+  "fonts": [
+   "와일드각"
+  ],
+  "note": "misty2050 요즘 릴스에서 자주 보이는 감성 폰트 5종"
+ },
+ {
+  "img": "font-archive/ig_DWQwZhqE9kx_02.jpg?v=3",
+  "date": "2026.03.24",
+  "fonts": [
+   "mk 단단체"
+  ],
+  "note": "misty2050 요즘 릴스에서 자주 보이는 감성 폰트 5종"
+ },
+ {
+  "img": "font-archive/ig_DWQwZhqE9kx_03.jpg?v=3",
+  "date": "2026.03.24",
+  "fonts": [
+   "낼나 예샘체"
+  ],
+  "note": "misty2050 요즘 릴스에서 자주 보이는 감성 폰트 5종"
+ },
+ {
+  "img": "font-archive/ig_DWQwZhqE9kx_04.jpg?v=3",
+  "date": "2026.03.24",
+  "fonts": [
+   "Cafe PRO Slim"
+  ],
+  "note": "misty2050 요즘 릴스에서 자주 보이는 감성 폰트 5종"
+ },
+ {
+  "img": "font-archive/ig_DWQwZhqE9kx_05.jpg?v=3",
+  "date": "2026.03.24",
+  "fonts": [
+   "세종 글꽃체"
+  ],
+  "note": "misty2050 요즘 릴스에서 자주 보이는 감성 폰트 5종"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_02.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAFAdTR1BFc"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_03.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAGKI4LfWJM"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_04.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAGawMogR0g"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_05.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAFh8ZGLrqo"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_06.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAGWPuH9WPo"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_07.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAGXr8XaowM"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DWIDpY1k9Vf_08.jpg?v=3",
+  "date": "2026.03.20",
+  "fonts": [
+   "캔바 시크릿 set:nAGCpubEafs"
+  ],
+  "note": "misty2050 캔바 시크릿 폰트 사용법(요소 검색 코드)"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_01.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "제주돌담체"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_02.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "배달의민족 꾸불림"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_03.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "배달의민족 기랑해랑체"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_04.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "낭만있구미체"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_05.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "메모먼트 꾹꾹체"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
+  "img": "font-archive/ig_DTFmrO6k921_06.jpg?v=3",
+  "date": "2026.01.04",
+  "fonts": [
+   "Y 최애체"
+  ],
+  "note": "misty2050 썸네일용 독특한 무료 폰트 6종"
+ },
+ {
   "img": "font-archive/20251126_112054.jpg?v=3",
   "date": "2025.11.26",
   "fonts": [
    "캘리크라퍼 Crayon"
   ],
   "note": "dearmooee 감성 한글 폰트 소개 3/13"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_01.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 이빈나"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_02.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 유나유하"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_03.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 반듯한예니체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_04.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 에버라이팅"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_05.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 레디오 볼펜체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_06.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 쑴체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_07.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 적는대로이루어져라"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_08.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 베리려원"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_09.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 올리폴리 얇또박"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_10.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 유우체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_11.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 의연체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_12.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 하연"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQWV6GVE3gU_13.jpg?v=3",
+  "date": "2025.10.28",
+  "fonts": [
+   "온글잎 몽몽데이즈몽글동심체"
+  ],
+  "note": "misty2050 손글씨 추천 폰트 귀여운 13종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_00.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 콘콘체"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_07.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 박다현체"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_08.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 위시리스트"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_09.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 김콩해"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_10.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 류뚱체"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_11.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 혜원손글씨체"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_12.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 얇자수"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_13.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 두다"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_14.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 지구를지키자"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_15.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 찐찐"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DQG05r5Ey2P_16.jpg?v=3",
+  "date": "2025.10.22",
+  "fonts": [
+   "온글잎 강신현굴림"
+  ],
+  "note": "misty2050 손글씨 추천 무료 폰트 11종"
+ },
+ {
+  "img": "font-archive/ig_DL3zExjPCuY_01.jpg?v=3",
+  "date": "2025.07.08",
+  "fonts": [
+   "Rosalia(인스타 스토리 폰트)"
+  ],
+  "note": "misty2050 인스타 스토리 숨겨진 폰트"
  }
 ];
