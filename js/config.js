@@ -16,20 +16,7 @@ window.CONFIG = {
   HOMEWORK_DASHBOARD: 'https://oreum1222.github.io/homework/dashboard.html',
   HOMEWORK_SITE: 'https://oreum1222.github.io/homework/',
 
-  // 허브 강좌 id ↔ 과제 검사 시스템(hwsys) courseId 매핑.
-  //  h2  = 고2 단과 화법과 언어 → 현재 '화법과언어(연합반)'
-  //  g2cs= 고2 수능 정규반('우리들의 첫 수능', 한티 MEXX)
-  //  g3f/g3s = 오름 수능 정규반(금/토) → go3-regular (사용자 요청으로 과제 탭 포함)
-  //  h1/sm3/sh1 = 종강(고1 고전 · 중3 현대문법 · 고1 고전문법)
-  HW_COURSE_MAP: {
-    h2:   'hanti-dan-h2-hwaeon2',
-    g2cs: 'hanti-dan-h2-suneung',
-    g3f:  'go3-regular',
-    g3s:  'go3-regular',
-    h1:   'hanti-dan-h1-gojeon',
-    sm3:  'hanti-jong-m3-hyeonbeop',
-    sh1:  'hanti-jong-h1-gojeonbeop',
-  },
+
   // 과제 탭에서 '진행 중'으로 볼 hwsys courseId (없으면 종강 토글). 오름 수능정규반(go3-regular) 포함.
   HW_ACTIVE: ['hanti-dan-h2-hwaeon2', 'hanti-dan-h2-suneung', 'go3-regular'],
 
@@ -65,7 +52,7 @@ window.CONFIG = {
     sh1: 'hanti-jong-h1-gojeonbeop', sm3: 'hanti-jong-m3-hyeonbeop',
     g3f: 'go3-regular', g3s: 'go3-regular',
     g2cs: 'hanti-dan-h2-suneung',
-    g2he: 'hanti-dan-h2-hwaeon',
+    g2he: 'hanti-dan-h2-hwaeon2', // 화법과 언어 연합반(가을). 여름 단과는 h2 → hanti-dan-h2-hwaeon
   },
   // 백엔드 senderFor_가 courseId 'hanti-' 접두로 한티 9279-9349 라우팅함(이미 반영됨). false면 한티 실발송 차단.
   SEND_SENDER_ROUTING: true,
