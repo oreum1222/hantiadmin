@@ -54,6 +54,9 @@ MEXX에서 국어 강의 수강을 시작한 학생에게 드리는 안내입니
 https://www.youtube.com/@%EA%B0%80%EA%B2%BDT
 *구독하여 영상 확인
 
+[과제 검사 및 공지사항 확인]
+https://hanti.oreumyak.com/
+
 *선생님에게 전달할 사항은 문자로 보내주면 확인이 가장 빠릅니다. (카톡은 연락이 많아 확인이 늦어질 수 있습니다.)
 *강의 등록 및 교재 수령은 데스크에서 이루어집니다.`
   },
@@ -69,6 +72,9 @@ https://www.youtube.com/@%EA%B0%80%EA%B2%BDT
 
 ▶ 학부모님 관찰 진단
 https://oreum1222.github.io/oreum-fassessment/
+
+▶ 과제 검사 및 공지사항 확인
+https://hanti.oreumyak.com/
 
 아이의 성향을 세심하게 살피고, 더욱 효과적인 수능 국어 학습이 이루어질 수 있도록 연구하고자 합니다. 감사합니다.`
   },
