@@ -42,6 +42,7 @@ Views.tasks = function (el) {
         { id: 'b', label: '최종 편집', by: '조교' },
         { id: 'c', label: '이번 주 없음', by: '' },
       ] },
+      { id: 'mat-hy-5', label: '숙제 검사 리포트 문자 발송' },
     ] },
     { group: '수능 국어', icon: 'menu_book', items: [
       { id: 'mat-su-1', label: '교재', steps: [
@@ -60,6 +61,7 @@ Views.tasks = function (el) {
         { id: 'b', label: '워크북 해설지 초안', by: '재희' },
         { id: 'c', label: '최종 전달', by: '' },
       ] },
+      { id: 'mat-su-4', label: '숙제 검사 리포트 문자 발송' },
     ] },
   ];
 
