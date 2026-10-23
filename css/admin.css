@@ -21,7 +21,7 @@ html.light {
 @font-face{
   font-family:'Material Symbols Outlined';
   font-style:normal;font-weight:100 700;font-display:block;
-  src:url('../fonts/material-symbols-subset-v2.woff2') format('woff2');
+  src:url('../fonts/material-symbols-subset-v3.woff2') format('woff2');
 }
 .material-symbols-outlined{
   font-family:'Material Symbols Outlined';

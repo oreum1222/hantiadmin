@@ -18,3 +18,6 @@ js/*-data.js
 js/enroll-start.js
 *.csv
 *.xlsx
+
+tools/full.woff2
+tools/icons.txt
