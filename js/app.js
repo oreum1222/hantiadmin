@@ -12,7 +12,7 @@ window.U = {
     return `<span class="chip border ${map[status] || 'text-on-surface-variant border-outline-variant'}">${U.esc(status)}</span>`;
   },
   mkChip(status) {
-    const map = { '필요': 'text-red-400 bg-red-400/10 border-red-400/30', '신청됨': 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30', '영상전달': 'text-blue-400 bg-blue-400/10 border-blue-400/30', '완료': 'text-secondary bg-secondary-fixed/60 border-secondary/25' };
+    const map = { '필요': 'text-red-400 bg-red-400/10 border-red-400/30', '신청됨': 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30', '영상전달': 'text-blue-400 bg-blue-400/10 border-blue-400/30', '완료': 'text-secondary bg-secondary-fixed/60 border-secondary/25', '신청 안 함': 'text-on-surface-variant bg-surface-container-low border-outline-variant' };
     return `<span class="chip border ${map[status] || ''}">${U.esc(status)}</span>`;
   },
 };
@@ -40,7 +40,7 @@ window.App = {
     let present = 0;
     recs.forEach(r => {
       if (['출석', '지각', '온라인', '보강'].includes(r.status)) present++;
-      else if (r.status === '결석') { const m = mk[r.studentId]; if (m && m.status && m.status !== '필요') present++; } // 보강 신청/전달/완료 → 출석 인정
+      else if (r.status === '결석') { const m = mk[r.studentId]; if (m && m.status && m.status !== '필요' && m.status !== CONFIG.MAKEUP_SKIP) present++; } // 보강 신청/전달/완료 → 출석 인정('신청 안 함'은 제외)
     });
     return { present, total: recs.length, issue: recs.length - present };
   },

@@ -29,7 +29,7 @@ Views.students = function (el) {
 
   const rowHTML = s => {
     const abs = App.db.attendance.filter(a => a.studentId === s.id && a.status === '결석').length;
-    const mk = App.db.makeups.filter(m => m.studentId === s.id && m.status !== '완료').length;
+    const mk = App.db.makeups.filter(m => m.studentId === s.id && !CONFIG.MAKEUP_CLOSED.includes(m.status)).length;
     return `<tr class="row-click" onclick="location.hash='#students/${s.id}'">
       <td class="font-bold">${U.esc(s.name)}</td>
       <td class="text-on-surface-variant text-[13px]">${U.esc(s.school)} ${U.esc(s.grade)}</td>

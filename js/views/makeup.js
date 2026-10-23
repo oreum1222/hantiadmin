@@ -7,17 +7,20 @@ Views.makeup = function (el) {
     .filter(x => x.st)
     .sort((a, b) => (b.m.ts || '').localeCompare(a.m.ts || ''));
 
-  const counts = { '미완료': all.filter(x => x.m.status !== '완료').length, '전체': all.length };
-  CONFIG.MAKEUP_FLOW.forEach(s => counts[s] = all.filter(x => x.m.status === s).length);
+  const SKIP = CONFIG.MAKEUP_SKIP;
+  const open = x => !CONFIG.MAKEUP_CLOSED.includes(x.m.status);
+  const TABS = ['미완료', ...CONFIG.MAKEUP_FLOW, SKIP, '전체'];
+  const counts = { '미완료': all.filter(open).length, '전체': all.length };
+  [...CONFIG.MAKEUP_FLOW, SKIP].forEach(s => counts[s] = all.filter(x => x.m.status === s).length);
 
   el.innerHTML = `
   <div class="mb-6">
     <h1 class="text-2xl font-extrabold tracking-tight">보강 관리</h1>
-    <p class="text-on-surface-variant text-[14px] mt-1">결석 체크 시 자동으로 생성됩니다. 필요 → 신청됨 → 영상전달 → 완료 순서로 진행하세요.</p>
+    <p class="text-on-surface-variant text-[14px] mt-1">결석 체크 시 자동으로 생성됩니다. 필요 → 신청됨 → 영상전달 → 완료 순서로 진행하세요. 보강을 받지 않기로 한 결석은 '신청 안 함'으로 닫습니다.</p>
   </div>
 
   <div class="flex flex-wrap gap-2 mb-4">
-    ${['미완료', ...CONFIG.MAKEUP_FLOW, '전체'].map(f =>
+    ${TABS.map(f =>
       `<button class="btn ${f === filter ? 'btn-primary' : 'btn-ghost'} !py-1.5 !px-3.5 text-[13px] mk-filter" data-f="${f}">${f} <span class="opacity-70">${counts[f]}</span></button>`).join('')}
   </div>
 
@@ -25,7 +28,7 @@ Views.makeup = function (el) {
 
   function rows() {
     let list = all;
-    if (filter === '미완료') list = all.filter(x => x.m.status !== '완료');
+    if (filter === '미완료') list = all.filter(open);
     else if (filter !== '전체') list = all.filter(x => x.m.status === filter);
 
     const card = ({ m, st, ss, c }) => `
@@ -49,6 +52,7 @@ Views.makeup = function (el) {
               const isNext = CONFIG.MAKEUP_FLOW.indexOf(s) === CONFIG.MAKEUP_FLOW.indexOf(m.status) + 1;
               return `<button class="btn ${on ? 'btn-primary' : isNext ? 'btn-ghost !border-secondary/40 !text-secondary' : 'btn-ghost'} !py-1.5 !px-3 text-[12px] mk-step" data-id="${m.id}" data-s="${s}" ${on ? 'disabled' : ''}>${s}</button>`;
             }).join('')}
+            <button class="btn ${m.status === SKIP ? 'btn-primary' : 'btn-ghost'} !py-1.5 !px-3 text-[12px] mk-step" data-id="${m.id}" data-s="${SKIP}" ${m.status === SKIP ? 'disabled' : ''} title="보강을 받지 않기로 함(동영상 신청 안 함, 환불 등)">${SKIP}</button>
             <button class="btn btn-ghost !py-1.5 !px-2.5 text-[12px] mk-edit" data-id="${m.id}" title="방식·메모"><span class="material-symbols-outlined text-[16px]">edit_note</span></button>
           </div>
         </div>

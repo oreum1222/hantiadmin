@@ -8,7 +8,7 @@ Views.home = function (el) {
     .map(s => ({ s, c: App.courseOf(s.courseId) })).filter(x => x.c);
 
   // 미처리 보강
-  const pendingMk = App.db.makeups.filter(m => m.status !== '완료');
+  const pendingMk = App.db.makeups.filter(m => !CONFIG.MAKEUP_CLOSED.includes(m.status));
 
   // 최근 7일 결석
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
