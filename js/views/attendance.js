@@ -41,7 +41,7 @@ Views.attendance = function (el) {
       })()}
     </select>
     <select id="at-session" class="fld !w-auto" ${sessions.length ? '' : 'disabled'}>
-      ${sessions.map(s => `<option value="${s.id}" ${s.id === sessionId ? 'selected' : ''}>${s.no}회차 · ${U.fmtD(s.date)}</option>`).join('')}
+      ${sessions.slice().reverse().map(s => `<option value="${s.id}" ${s.id === sessionId ? 'selected' : ''}>${s.no}회차 · ${U.fmtD(s.date)}</option>`).join('')}
     </select>
     <div class="flex-1"></div>
     <div class="flex items-center gap-2 text-[13px] text-on-surface-variant">

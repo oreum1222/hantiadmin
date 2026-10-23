@@ -95,7 +95,7 @@ function renderDetail(el, courseId) {
       </div>
       <div class="overflow-x-auto"><table class="tbl">
         <thead><tr><th class="w-12">회차</th><th class="w-24">날짜</th><th>진도</th><th class="w-20">출결</th><th class="w-16"></th></tr></thead>
-        <tbody>${sessions.map(s => {
+        <tbody>${sessions.slice().reverse().map(s => { // 최근 회차가 맨 위
           const recs = App.attOf(s.id);
           const sum = App.attSummary(s.id);
           const isPast = s.date && s.date <= U.today();
@@ -148,7 +148,7 @@ function renderDetail(el, courseId) {
   if (CONFIG.HW_COURSE_MAP[c.id]) {
     App.hwAssignments().then(map => {
       const box = document.getElementById('hw-assign-list'); if (!box) return;
-      const arr = map[CONFIG.HW_COURSE_MAP[c.id]] || [];
+      const arr = (map[CONFIG.HW_COURSE_MAP[c.id]] || []).slice().reverse(); // 최근 회차가 맨 위
       box.innerHTML = arr.length
         ? `<ul class="space-y-1.5">${arr.map(a => {
             const wkM = a.label.match(/^\s*(\d[\d\-]*\s*주차)/);

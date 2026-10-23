@@ -84,7 +84,7 @@ Views.homework = function (el) {
     </div>
 
     ${(() => { const renderCourse = id => {
-      const weeks = assign[id] || [];
+      const weeks = (assign[id] || []).slice().reverse(); // 최근 회차가 맨 위(과제 검사 시스템 등록 순서의 역순)
       const reg = rosterCount[id] || 0;
       const pend = pendMap[id] || {};
       const _hubs = (hwHubs[id] || []).map(h => App.courseOf(h)).filter(Boolean);
