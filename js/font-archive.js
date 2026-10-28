@@ -2,6 +2,74 @@
 // 원본: 가경T 폰 스크린샷 중 폰트 캡처. 이미지는 font-archive/ 폴더.
 window.FONT_ARCHIVE = [
  {
+  "img": "font-archive/20261028_De1InjdASkr_1.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "망고빙수체",
+   "꾸불림체"
+  ],
+  "note": "studio.mepick 포인트 자막 무료 한글 폰트(눈누) 1/3"
+ },
+ {
+  "img": "font-archive/20261028_De1InjdASkr_2.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "그리운 겔리롤",
+   "이서윤체"
+  ],
+  "note": "studio.mepick 포인트 자막 무료 한글 폰트(눈누) 2/3"
+ },
+ {
+  "img": "font-archive/20261028_De1InjdASkr_4.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "신라문화체",
+   "윤초록우산어린이 대한체"
+  ],
+  "note": "studio.mepick 포인트 자막 무료 한글 폰트(눈누) 3/3"
+ },
+ {
+  "img": "font-archive/20261028_De1InjdASkr_6.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "교보손글씨 2019",
+   "온글잎 콘콘체"
+  ],
+  "note": "studio.mepick 포인트 자막 무료 한글 폰트(눈누) 보너스"
+ },
+ {
+  "img": "font-archive/20261028_De8v04SETBL_1.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "감다살체"
+  ],
+  "note": "design.mimm 느좋 폰트 3탄 — 귀엽고 레트로한 느낌"
+ },
+ {
+  "img": "font-archive/20261028_De8v04SETBL_2.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "오이냉체"
+  ],
+  "note": "design.mimm 느좋 폰트 3탄 — 키워드 포인트"
+ },
+ {
+  "img": "font-archive/20261028_De8v04SETBL_4.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "OG르네상스의 비밀체"
+  ],
+  "note": "design.mimm 느좋 폰트 3탄 — 고급스러운 썸네일"
+ },
+ {
+  "img": "font-archive/20261028_De8v04SETBL_6.jpg?v=3",
+  "date": "2026.10.28",
+  "fonts": [
+   "한굴림체"
+  ],
+  "note": "design.mimm 느좋 폰트 3탄 — 가로로 길쭉한 고딕"
+ },
+ {
   "img": "font-archive/20260930_222336.jpg?v=3",
   "date": "2026.09.30",
   "fonts": [
